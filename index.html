@@ -3,102 +3,59 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>Monster Chess 3D</title>
+<title>Monster Chess 3D - Royal Edition</title>
 <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; user-select: none; -webkit-tap-highlight-color: transparent; }
-    body { background: #101323; color: white; overflow: hidden; width: 100vw; height: 100vh; }
+    body { background: #050508; color: white; overflow: hidden; width: 100vw; height: 100vh; }
 
-    /* =========================================
-       1. الواجهة الرئيسية
-       ========================================= */
+    /* الواجهة الرئيسية */
     #main-menu {
         position: absolute; inset: 0; z-index: 100;
-        /* ⚠️ اسم الصورة هنا */
         background-image: url('menu.png'); 
         background-size: 100% 100%;
         background-position: center;
         background-repeat: no-repeat;
-        background-color: #000; /* احتياطي */
+        background-color: #000;
     }
-    
     .hotspot { position: absolute; background: transparent; border: none; cursor: pointer; border-radius: 15px; z-index: 10; transition: background 0.1s; }
     .hotspot:active { background: rgba(255, 255, 255, 0.2); }
-
-    /* إحداثيات الأزرار الشفافة */
-    .btn-settings { top: 1.5%; left: 2%; width: 8%; height: 4%; border-radius: 50%; } 
-    .btn-cart { top: 1.5%; left: 12%; width: 9%; height: 4%; } 
-    .btn-gold-plus { top: 1.5%; left: 37%; width: 6%; height: 3%; border-radius: 50%; } 
-    .btn-gem-plus { top: 1.5%; left: 71%; width: 6%; height: 3%; border-radius: 50%; } 
-    .btn-profile { top: 1.5%; right: 2%; width: 13%; height: 6%; border-radius: 50%; } 
-    .btn-tournament { top: 8.5%; left: 2.5%; width: 20%; height: 6.5%; } 
-    .btn-ranking { top: 9.5%; right: 2.5%; width: 18%; height: 4.5%; } 
-    .btn-champions { top: 15.5%; right: 2.5%; width: 18%; height: 5%; } 
-    .btn-friends { top: 48.5%; left: 3%; width: 45%; height: 12%; } 
+    .btn-start { top: 48.5%; right: 3%; width: 45%; height: 12%; } 
     
-    /* 🟢 الزر اللي يفتح اللعبة */
-    .btn-vs-computer { top: 48.5%; right: 3%; width: 45%; height: 12%; } 
-    
-    .btn-online { top: 61.5%; left: 3%; width: 45%; height: 12%; } 
-    .btn-quick { top: 61.5%; right: 3%; width: 45%; height: 12%; } 
-    .nav-store { bottom: 0; left: 0; width: 20%; height: 10%; } 
-    .nav-inventory { bottom: 0; left: 20%; width: 20%; height: 10%; } 
-    .nav-home { bottom: 0; left: 40%; width: 20%; height: 10%; } 
-    .nav-stats { bottom: 0; left: 60%; width: 20%; height: 10%; } 
-    .nav-achievements { bottom: 0; left: 80%; width: 20%; height: 10%; } 
-
-    /* =========================================
-       2. شاشة اللعبة 3D
-       ========================================= */
+    /* شاشة اللعبة */
     #game-container {
         position: absolute; inset: 0; display: none; flex-direction: column; z-index: 50;
-        background: #101323;
+        background: #050508;
     }
-    #top-bar { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #202943; z-index: 10; }
-    #status { color: #8ee7ff; font-size: 16px; font-weight: bold; }
-    .btn-back { background: #ff4d4d; color: white; border: none; padding: 8px 15px; border-radius: 10px; font-weight: bold; cursor: pointer; }
-    .btn-back:active { transform: scale(0.95); }
+    #top-bar { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: rgba(0,0,0,0.6); z-index: 10; border-bottom: 1px solid #d4af37; }
+    #status { color: #ffd700; font-size: 16px; font-weight: bold; text-shadow: 0 0 10px #ffd700; }
+    .btn-back { background: #8b0000; color: #fff; border: 1px solid #ffd700; padding: 8px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
     
-    #game { flex: 1; width: 100%; position: relative; }
+    #game { flex: 1; width: 100%; position: relative; touch-action: none; }
     
-    .panel { padding: 10px; background: #15192b; text-align: center; }
-    .panel select, .panel button {
-        padding: 10px 15px; border: 0; border-radius: 10px;
-        background: #ffc857; color: #222; font-weight: bold;
-        margin: 5px; font-size: 14px; cursor: pointer;
+    /* شريط الإعدادات السفلي */
+    .panel { padding: 10px; background: rgba(0,0,0,0.8); text-align: center; border-top: 1px solid #d4af37; display: flex; flex-direction: column; gap: 8px;}
+    
+    .row { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+    
+    select, button {
+        padding: 10px 15px; border: 1px solid #d4af37; border-radius: 8px;
+        background: linear-gradient(to bottom, #ffd700, #b8860b); color: #000; font-weight: bold;
+        font-size: 14px; cursor: pointer;
     }
+    button:active { transform: scale(0.95); }
+    
+    /* أزرار الكاميرا */
+    .cam-btn { background: linear-gradient(to bottom, #4a4a4a, #222); color: #ffd700; border-color: #ffd700; }
 </style>
 </head>
 <body>
 
-    <!-- =========================================
-         الواجهة الرئيسية
-         ========================================= -->
+    <!-- الواجهة الرئيسية -->
     <div id="main-menu">
-        <div class="hotspot btn-settings" onclick="alert('الإعدادات')"></div>
-        <div class="hotspot btn-cart" onclick="alert('سلة المشتريات')"></div>
-        <div class="hotspot btn-gold-plus" onclick="alert('شراء ذهب')"></div>
-        <div class="hotspot btn-gem-plus" onclick="alert('شراء جواهر')"></div>
-        <div class="hotspot btn-profile" onclick="alert('الملف الشخصي')"></div>
-        <div class="hotspot btn-tournament" onclick="alert('بطولة الشطرنج')"></div>
-        <div class="hotspot btn-ranking" onclick="alert('الترتيب')"></div>
-        <div class="hotspot btn-champions" onclick="alert('لوحة الأبطال')"></div>
-        <div class="hotspot btn-friends" onclick="alert('تحدي الأصدقاء')"></div>
-        
-        <!-- 🟢 زر اللعب ضد الكمبيوتر -->
-        <div class="hotspot btn-vs-computer" onclick="startGame()"></div>
-        <div class="hotspot btn-quick" onclick="startGame()"></div>
-        
-        <div class="hotspot btn-online" onclick="alert('الأونلاين قريباً')"></div>
-        <div class="hotspot nav-store" onclick="alert('المتجر')"></div>
-        <div class="hotspot nav-inventory" onclick="alert('المخزون')"></div>
-        <div class="hotspot nav-home" onclick="alert('أنت في الرئيسية')"></div>
-        <div class="hotspot nav-stats" onclick="alert('الإحصائيات')"></div>
-        <div class="hotspot nav-achievements" onclick="alert('الإنجازات')"></div>
+        <div class="hotspot btn-start" onclick="startGame()"></div>
     </div>
 
-    <!-- =========================================
-         شاشة اللعبة 3D
-         ========================================= -->
+    <!-- شاشة اللعبة -->
     <div id="game-container">
         <div id="top-bar">
             <div id="status">دورك الآن - الأبيض</div>
@@ -107,13 +64,22 @@
         
         <div id="game"></div>
         
+        <!-- شريط الإعدادات وأزرار الكاميرا -->
         <div class="panel">
-            <select id="level">
-                <option value="easy">🟢 سهل</option>
-                <option value="hard">🔴 صعب</option>
-            </select>
-            <button onclick="restart()">🔄 لعبة جديدة</button>
-            <button onclick="undo()">↩ تراجع</button>
+            <div class="row">
+                <select id="level">
+                    <option value="easy">🟢 سهل</option>
+                    <option value="hard">🔴 صعب</option>
+                </select>
+                <button onclick="restart()">🔄 لعبة جديدة</button>
+                <button onclick="undo()">↩ تراجع</button>
+            </div>
+            <div class="row">
+                <span style="color:#d4af37; font-size:12px; align-self:center; font-weight:bold;">زاوية الكاميرا:</span>
+                <button class="cam-btn" onclick="setCameraView('default')">📐 افتراضية</button>
+                <button class="cam-btn" onclick="setCameraView('top')">🔼 علوية</button>
+                <button class="cam-btn" onclick="setCameraView('side')">◀️ جانبية</button>
+            </div>
         </div>
     </div>
 
@@ -134,8 +100,10 @@
 
     const game = new Chess();
     const holder = document.getElementById("game");
+    
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x0a0c10);
+    scene.background = new THREE.Color(0x050508); 
+    scene.fog = new THREE.Fog(0x050508, 15, 35);
 
     const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100);
     camera.position.set(0, 11, 11); 
@@ -146,24 +114,38 @@
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     holder.appendChild(renderer.domElement);
 
+    // =========================================
+    // إعدادات الكاميرا (ثابتة + أزرار تحكم)
+    // =========================================
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.target.set(0, 0, 0);
     controls.enableDamping = true;
-    controls.enablePan = false; 
-    controls.minDistance = 9;   
-    controls.maxDistance = 14;  
-    controls.minPolarAngle = Math.PI / 4; 
-    controls.maxPolarAngle = Math.PI / 2.2; 
+    
+    // قفل التحكم اليدوي (الرقعة ثابتة)
+    controls.enableRotate = false; // منع التدوير بالسحب
+    controls.enablePan = false;    // منع تحريك الرقعة
+    
+    // السماح فقط بالتقريب والتبعيد
+    controls.minDistance = 6;   
+    controls.maxDistance = 20;  
+    
     controls.update();
 
-    scene.add(new THREE.HemisphereLight(0xffffff, 0x333344, 1.5));
-    const light = new THREE.DirectionalLight(0xfff5e6, 2.5);
-    light.position.set(5, 12, 7);
+    // الإضاءة
+    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+    const light = new THREE.DirectionalLight(0xfff5e6, 2);
+    light.position.set(5, 15, 5);
     light.castShadow = true;
+    light.shadow.mapSize.width = 1024;
+    light.shadow.mapSize.height = 1024;
     scene.add(light);
 
-    const board = new THREE.Group(); scene.add(board);
-    const pieces = new THREE.Group(); scene.add(pieces);
+    const backLight = new THREE.PointLight(0x4455ff, 1, 20);
+    backLight.position.set(0, 5, -8);
+    scene.add(backLight);
+
+    const boardGroup = new THREE.Group(); scene.add(boardGroup);
+    const piecesGroup = new THREE.Group(); scene.add(piecesGroup);
 
     const raycaster = new THREE.Raycaster();
     const pointer = new THREE.Vector2();
@@ -171,73 +153,113 @@
     let selected = null; let busy = false; let squares = []; let pieceMeshes = [];
     const files = "abcdefgh";
 
-    // تصميم الرقعة الخشبية
-    const frame = new THREE.Mesh(
-        new THREE.BoxGeometry(9.4, 0.5, 9.4),
-        new THREE.MeshStandardMaterial({ color: 0x3E2723, roughness: 0.7 })
-    );
-    frame.position.y = -0.25; frame.receiveShadow = true; board.add(frame);
+    // المواد (رخام وذهب)
+    const goldMat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 1.0, roughness: 0.2 });
+    const darkMarbleMat = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.2, metalness: 0.1 });
+    const lightMarbleMat = new THREE.MeshStandardMaterial({ color: 0xf5f5f5, roughness: 0.2, metalness: 0.1 });
+    const whitePieceMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.15, metalness: 0.1 });
+    const blackPieceMat = new THREE.MeshStandardMaterial({ color: 0x0a0a0a, roughness: 0.3, metalness: 0.2 });
 
-    const lightWood = 0xF0D9B5; const darkWood = 0xB58863;
+    // الرقعة
+    const frame = new THREE.Mesh(new THREE.BoxGeometry(9.6, 0.5, 9.6), goldMat);
+    frame.position.y = -0.26; 
+    frame.receiveShadow = true; frame.castShadow = true;
+    boardGroup.add(frame);
 
-    function makeSquare(x, z, color) {
+    function makeSquare(x, z, isDark) {
         const mesh = new THREE.Mesh(
             new THREE.BoxGeometry(1, 0.2, 1),
-            new THREE.MeshStandardMaterial({ color: color, roughness: 0.5 })
+            isDark ? darkMarbleMat : lightMarbleMat
         );
         mesh.position.set(x, 0, z); 
         mesh.receiveShadow = true;
-        mesh.userData.square = true;
-        mesh.userData.originalColor = color;
-        board.add(mesh); squares.push(mesh);
+        mesh.userData = { square: true, isDark: isDark };
+        boardGroup.add(mesh); 
+        squares.push(mesh);
     }
 
     for (let r = 0; r < 8; r++) {
         for (let f = 0; f < 8; f++) {
-            makeSquare(f - 3.5, 3.5 - r, (r + f) % 2 !== 0 ? darkWood : lightWood);
+            makeSquare(f - 3.5, 3.5 - r, (r + f) % 2 !== 0);
         }
     }
 
-    // تصميم الوحوش
-    function monster(type, color) {
+    // البيادق الفخمة
+    function createLuxuryPiece(type, color) {
         const group = new THREE.Group();
-        const bodyColor = color === "w" ? 0x37c9b0 : 0x8e55d8;
-        const material = new THREE.MeshStandardMaterial({ color: bodyColor, roughness: 0.4, metalness: 0.3 });
-        const dark = new THREE.MeshStandardMaterial({ color: 0x202030 });
-        const eye = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xaaaaaa });
-        const black = new THREE.MeshStandardMaterial({ color: 0x111111 });
-        const gold = new THREE.MeshStandardMaterial({ color: 0xffd166, metalness: 0.8, roughness: 0.2 });
-
-        function sphere(x, y, z, sx, sy, sz, mat) {
-            const m = new THREE.Mesh(new THREE.SphereGeometry(1, 20, 16), mat);
-            m.position.set(x, y, z); m.scale.set(sx, sy, sz);
-            m.castShadow = true; m.receiveShadow = true; group.add(m);
+        const mat = color === "w" ? whitePieceMat : blackPieceMat;
+        
+        const add = (geo, y, scaleX=1, scaleY=1, scaleZ=1, customMat=mat) => {
+            const m = new THREE.Mesh(geo, customMat);
+            m.position.y = y;
+            m.scale.set(scaleX, scaleY, scaleZ);
+            m.castShadow = true; m.receiveShadow = true;
+            group.add(m);
             return m;
-        }
-        function horn(x, z, isGold = false) {
-            const h = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.4, 12), isGold ? gold : material);
-            h.position.set(x, 1.25, z); h.castShadow = true; group.add(h);
-        }
+        };
 
-        sphere(0, 0.45, 0, 0.35, 0.45, 0.3, material);
-        sphere(0, 0.9, 0, 0.34, 0.34, 0.32, material);
-        for (const x of [-0.14, 0.14]) {
-            sphere(x, 1.0, 0.27, 0.10, 0.12, 0.07, eye);
-            sphere(x, 1.0, 0.33, 0.045, 0.065, 0.035, black);
+        add(new THREE.CylinderGeometry(0.4, 0.45, 0.15, 32), 0.075); 
+        add(new THREE.CylinderGeometry(0.3, 0.4, 0.1, 32), 0.2);     
+        add(new THREE.TorusGeometry(0.35, 0.03, 16, 32), 0.15, 1, 1, 1, goldMat).rotation.x = Math.PI / 2; 
+
+        switch (type) {
+            case "p":
+                add(new THREE.CylinderGeometry(0.15, 0.25, 0.4, 32), 0.45);
+                add(new THREE.TorusGeometry(0.15, 0.02, 16, 32), 0.65, 1, 1, 1, goldMat).rotation.x = Math.PI / 2;
+                add(new THREE.SphereGeometry(0.15, 32, 16), 0.8);
+                break;
+            case "r":
+                add(new THREE.CylinderGeometry(0.25, 0.3, 0.5, 32), 0.5);
+                add(new THREE.CylinderGeometry(0.32, 0.32, 0.1, 32), 0.8);
+                add(new THREE.CylinderGeometry(0.35, 0.35, 0.15, 32), 0.9);
+                add(new THREE.TorusGeometry(0.32, 0.02, 16, 32), 0.8, 1, 1, 1, goldMat).rotation.x = Math.PI / 2;
+                break;
+            case "n":
+                add(new THREE.CylinderGeometry(0.15, 0.25, 0.4, 32), 0.45);
+                const head = add(new THREE.BoxGeometry(0.25, 0.4, 0.2), 0.75);
+                head.rotation.x = -0.4; head.position.z = 0.1;
+                add(new THREE.ConeGeometry(0.05, 0.15, 8), 1.0, 1, 1, 1, goldMat).position.z = 0.05;
+                break;
+            case "b":
+                add(new THREE.CylinderGeometry(0.18, 0.25, 0.6, 32), 0.55);
+                add(new THREE.SphereGeometry(0.22, 32, 16), 0.9);
+                add(new THREE.ConeGeometry(0.1, 0.2, 32), 1.15);
+                add(new THREE.SphereGeometry(0.05, 16, 16), 1.25, 1, 1, 1, goldMat);
+                break;
+            case "q":
+                add(new THREE.CylinderGeometry(0.2, 0.28, 0.7, 32), 0.6);
+                add(new THREE.TorusGeometry(0.22, 0.03, 16, 32), 0.95, 1, 1, 1, goldMat).rotation.x = Math.PI / 2;
+                add(new THREE.CylinderGeometry(0.25, 0.25, 0.1, 32), 1.0);
+                for(let i=0; i<6; i++) {
+                    const angle = (i * Math.PI * 2) / 6;
+                    const spike = new THREE.Mesh(new THREE.ConeGeometry(0.04, 0.15, 8), goldMat);
+                    spike.position.set(Math.cos(angle)*0.2, 1.1, Math.sin(angle)*0.2);
+                    spike.castShadow = true;
+                    group.add(spike);
+                }
+                add(new THREE.SphereGeometry(0.06, 16, 16), 1.2, 1, 1, 1, goldMat);
+                break;
+            case "k":
+                add(new THREE.CylinderGeometry(0.2, 0.28, 0.8, 32), 0.65);
+                add(new THREE.TorusGeometry(0.22, 0.03, 16, 32), 1.05, 1, 1, 1, goldMat).rotation.x = Math.PI / 2;
+                add(new THREE.CylinderGeometry(0.25, 0.25, 0.1, 32), 1.1);
+                add(new THREE.BoxGeometry(0.06, 0.25, 0.06), 1.27, 1, 1, 1, goldMat);
+                add(new THREE.BoxGeometry(0.18, 0.06, 0.06), 1.3, 1, 1, 1, goldMat);
+                break;
         }
-        if (type === "k") { horn(-0.2, 0, true); horn(0.2, 0, true); sphere(0, 1.4, 0, 0.28, 0.12, 0.25, gold); }
-        if (type === "q") { for (let i = -1; i <= 1; i++) horn(i * 0.2, 0, true); sphere(0, 1.3, 0, 0.2, 0.15, 0.2, gold); }
-        if (type === "r") { const crown = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.2, 0.6), gold); crown.position.y = 1.25; crown.castShadow = true; group.add(crown); }
-        if (type === "b") { horn(0, 0, true); sphere(0, 1.3, 0, 0.13, 0.18, 0.13, dark); }
-        if (type === "n") { sphere(0, 0.9, 0.35, 0.15, 0.22, 0.35, dark); horn(0.15, 0.1, true); }
-        if (type === "p") { sphere(0, 1.25, 0, 0.13, 0.15, 0.13, gold); }
+        
+        if(color === 'b') {
+            group.traverse((child) => {
+                if(child.isMesh && child.material === blackPieceMat) child.material.emissive = new THREE.Color(0x222233);
+            });
+        }
         return group;
     }
 
     function squarePos(s) { return { x: files.indexOf(s[0]) - 3.5, z: 3.5 - (Number(s[1]) - 1) }; }
 
     function drawPieces() {
-        pieces.clear(); pieceMeshes = [];
+        piecesGroup.clear(); pieceMeshes = [];
         const boardState = game.board();
         for (let r = 0; r < 8; r++) {
             for (let f = 0; f < 8; f++) {
@@ -245,16 +267,16 @@
                 if (!p) continue;
                 const s = files[f] + (8 - r);
                 const pos = squarePos(s);
-                const obj = monster(p.type, p.color);
+                const obj = createLuxuryPiece(p.type, p.color);
                 obj.position.set(pos.x, 0.1, pos.z);
                 obj.userData = { position: s, color: p.color, type: p.type };
-                pieces.add(obj); pieceMeshes.push(obj);
+                piecesGroup.add(obj); pieceMeshes.push(obj);
             }
         }
     }
 
     function clearHighlights() {
-        squares.forEach(s => { s.material.color.setHex(s.userData.originalColor); s.material.emissive.setHex(0x000000); });
+        squares.forEach(s => { s.material = s.userData.isDark ? darkMarbleMat : lightMarbleMat; });
     }
 
     function highlightMoves(from) {
@@ -264,9 +286,11 @@
             const pos = squarePos(m.to);
             const sqr = squares.find(s => Math.abs(s.position.x - pos.x) < 0.01 && Math.abs(s.position.z - pos.z) < 0.01);
             if (sqr) {
-                const isCapture = game.get(m.to);
-                sqr.material.color.setHex(isCapture ? 0xff4444 : 0x44ff88);
-                sqr.material.emissive.setHex(isCapture ? 0x440000 : 0x004400);
+                sqr.material = new THREE.MeshStandardMaterial({ 
+                    color: game.get(m.to) ? 0xff0000 : 0x00ff00, 
+                    emissive: game.get(m.to) ? 0x550000 : 0x005500,
+                    transparent: true, opacity: 0.7
+                });
             }
         });
     }
@@ -274,7 +298,7 @@
     function status(text) { document.getElementById("status").textContent = text; }
 
     function finishCheck() {
-        if (game.isCheckmate()) { status("🏆 كش مات!"); return true; }
+        if (game.isCheckmate()) { status("🏆 كش مات! " + (game.turn() === "w" ? "الأسود فاز" : "أنت فزت!")); return true; }
         if (game.isDraw()) { status("🤝 تعادل!"); return true; }
         if (game.isCheck()) { status("⚠️ كش!"); return false; }
         status(game.turn() === "w" ? "دورك الآن" : "🤖 الكمبيوتر يفكر...");
@@ -310,7 +334,7 @@
         let chosen;
         if (!hard) {
             const captures = moves.filter(m => m.includes("x"));
-            const pool = Math.random() < 0.45 && captures.length ? captures : moves;
+            const pool = Math.random() < 0.5 && captures.length ? captures : moves;
             chosen = pool[Math.floor(Math.random() * pool.length)];
         } else {
             let best = -Infinity;
@@ -319,18 +343,35 @@
         game.move(chosen); drawPieces(); finishCheck();
     }
 
-    function click(event) {
+    // التفاعل (اللمس) - يعتمد على النقر وليس السحب
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    holder.addEventListener("pointerdown", (e) => {
+        touchStartX = e.clientX;
+        touchStartY = e.clientY;
+    });
+
+    holder.addEventListener("pointerup", (e) => {
+        // إذا تحرك الإصبع أكثر من 10 بكسل، نعتبره سحب للكاميرا وليس نقرة
+        if (Math.abs(e.clientX - touchStartX) > 10 || Math.abs(e.clientY - touchStartY) > 10) return;
+        
         if (busy || game.isGameOver() || game.turn() !== "w") return;
+
         const rect = renderer.domElement.getBoundingClientRect();
-        pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-        pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+        pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
         raycaster.setFromCamera(pointer, camera);
 
         const hit = raycaster.intersectObjects(pieceMeshes, true);
         let clicked = null;
-        if (hit.length) { let o = hit[0].object; while (o.parent && o.parent !== pieces) o = o.parent; if (o.parent === pieces) clicked = o; }
+        if (hit.length) { let o = hit[0].object; while (o.parent && o.parent !== piecesGroup) o = o.parent; if (o.parent === piecesGroup) clicked = o; }
 
-        if (clicked && clicked.userData.color === "w") { selected = clicked.userData.position; highlightMoves(selected); return; }
+        if (clicked && clicked.userData.color === "w") { 
+            selected = clicked.userData.position; 
+            highlightMoves(selected); 
+            return; 
+        }
 
         const squareHit = raycaster.intersectObjects(squares);
         if (squareHit.length && selected) {
@@ -342,24 +383,18 @@
                 if (!finishCheck()) { busy = true; setTimeout(() => { computerMove(); busy = false; }, 350); }
             }
         }
-    }
+    });
 
-    renderer.domElement.addEventListener("pointerdown", click);
-
-    // =========================================
-    // التحكم في الواجهة
-    // =========================================
+    // إدارة الواجهة
     window.startGame = function() {
         document.getElementById("main-menu").style.display = "none";
         document.getElementById("game-container").style.display = "flex";
-        
-        // تحديث أبعاد الكاميرا بعد ظهور اللعبة
         setTimeout(() => {
             const w = holder.clientWidth; const h = holder.clientHeight;
             if (w > 0 && h > 0) { camera.aspect = w / h; camera.updateProjectionMatrix(); renderer.setSize(w, h); }
         }, 100);
-        
         game.reset(); drawPieces(); clearHighlights(); status("دورك الآن - الأبيض");
+        setCameraView('default');
     };
 
     window.exitGame = function() {
@@ -370,7 +405,39 @@
     window.restart = function() { game.reset(); drawPieces(); clearHighlights(); status("دورك الآن - الأبيض"); };
     window.undo = function() { if (busy || game.history().length < 2) return; game.undo(); game.undo(); drawPieces(); clearHighlights(); status("تم التراجع"); };
 
-    function animate() { requestAnimationFrame(animate); controls.update(); renderer.render(scene, camera); }
+    // =========================================
+    // تغيير زوايا الكاميرا بسلاسة
+    // =========================================
+    let targetCameraPos = new THREE.Vector3(0, 11, 11);
+    let isCameraAnimating = false;
+
+    window.setCameraView = function(view) {
+        if (view === 'default') {
+            targetCameraPos.set(0, 11, 11);
+        } else if (view === 'top') {
+            targetCameraPos.set(0, 16, 0.1); // زاوية من فوق
+        } else if (view === 'side') {
+            targetCameraPos.set(13, 4, 0);   // زاوية جانبية
+        }
+        isCameraAnimating = true;
+    };
+
+    function animate() { 
+        requestAnimationFrame(animate); 
+        
+        // حركة الكاميرا السلسة
+        if (isCameraAnimating) {
+            camera.position.lerp(targetCameraPos, 0.1);
+            if (camera.position.distanceTo(targetCameraPos) < 0.1) {
+                camera.position.copy(targetCameraPos);
+                isCameraAnimating = false;
+            }
+            controls.target.set(0, 0, 0);
+        }
+
+        controls.update(); 
+        renderer.render(scene, camera); 
+    }
     animate();
 
     window.addEventListener("resize", () => {
