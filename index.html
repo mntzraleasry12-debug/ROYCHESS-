@@ -4,231 +4,80 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Chess 3D Buttons</title>
-
+<title>Chess 3D Controls</title>
 <style>
-* {
-  box-sizing: border-box;
-}
-
+* { box-sizing:border-box; }
 body {
-  margin: 0;
-  padding: 15px;
-  background: #080d25;
-  font-family: Tahoma, Arial;
-  color: white;
+  margin:0;
+  background:#000;
 }
-
-button {
-  font-family: inherit;
-  cursor: pointer;
-  color: white;
-  border: 3px solid #ffd65a;
-  border-radius: 22px;
-  font-weight: bold;
-  text-shadow: 0 2px 4px #000;
-  box-shadow:
-    0 5px 0 #633400,
-    0 8px 15px #000b,
-    inset 0 2px 8px #ffffff80;
-  transition: .15s;
+.game {
+  position:relative;
+  width:100%;
+  max-width:1024px;
+  margin:auto;
+  overflow:hidden;
 }
-
-button:active {
-  transform: translateY(5px);
-  box-shadow: 0 1px 0 #633400;
+.game img {
+  display:block;
+  width:100%;
+  height:auto;
 }
-
-/* الأزرار العلوية */
-
-.top-buttons {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  margin-bottom: 25px;
+.btn {
+  position:absolute;
+  border:0;
+  background:transparent;
+  cursor:pointer;
+  padding:0;
+  -webkit-tap-highlight-color:transparent;
 }
-
-.small-btn {
-  width: 55px;
-  height: 55px;
-  font-size: 25px;
-  background: linear-gradient(145deg,#555b80,#10152e);
-  border-color: #c9a7ff;
-  border-radius: 50%;
+.btn:active {
+  background:#ffffff18;
+  border-radius:15px;
 }
-
-.gold-btn {
-  background: linear-gradient(#fff18a,#ffb000,#a94d00);
-}
-
-/* أزرار اللعب */
-
-.game-buttons {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
-  margin-top: 25px;
-}
-
-.game-btn {
-  min-height: 175px;
-  padding: 15px 5px;
-  font-size: 21px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-}
-
-.game-btn span {
-  font-size: 45px;
-}
-
-.game-btn small {
-  font-size: 13px;
-}
-
-.purple {
-  background: linear-gradient(145deg,#ed00ff,#6800a8,#25004e);
-  border-color: #ff8bff;
-}
-
-.blue {
-  background: linear-gradient(145deg,#00eaff,#0054d9,#071b69);
-  border-color: #8dfaff;
-}
-
-.green {
-  background: linear-gradient(145deg,#b5ff00,#078b20,#064619);
-  border-color: #d5ff65;
-}
-
-.orange {
-  background: linear-gradient(145deg,#ffed00,#ff7900,#9c2700);
-  border-color: #ffe66c;
-}
-
-/* الأزرار السفلية */
-
-.bottom-buttons {
-  display: grid;
-  grid-template-columns: repeat(5,1fr);
-  gap: 5px;
-  margin-top: 30px;
-  padding: 8px 0;
-  border: 2px solid #d99b24;
-  border-radius: 18px;
-  background: linear-gradient(#252d50,#080d22);
-}
-
-.nav-btn {
-  background: linear-gradient(145deg,#343c5d,#11172d);
-  border: 1px solid #e5a62c;
-  border-radius: 12px;
-  padding: 10px 2px;
-  font-size: 12px;
-  min-height: 85px;
-  box-shadow: inset 0 0 10px #ffffff20;
-}
-
-.nav-btn span {
-  display: block;
-  font-size: 27px;
-  margin-bottom: 5px;
-}
-
-.home {
-  background: linear-gradient(#ffeb79,#ff9700,#713100);
-  border: 3px solid #ffe67a;
-  transform: scale(1.08);
-}
-
 </style>
 </head>
-
 <body>
 
+<div class="game">
+<img src="واجهة.png" alt="Chess 3D">
+
 <!-- الأزرار العلوية -->
-<div class="top-buttons">
-  <button class="small-btn" onclick="action('الإعدادات')">⚙️</button>
-  <button class="small-btn gold-btn" onclick="action('المتجر')">🛒</button>
-  <button class="small-btn gold-btn" onclick="action('العملات')">🪙</button>
-  <button class="small-btn gold-btn" onclick="action('الجواهر')">💎</button>
-  <button class="small-btn" onclick="action('الملف الشخصي')">👤</button>
-</div>
+<button class="btn" style="left:2%;top:1%;width:10%;height:7%" onclick="control('settings')" aria-label="الإعدادات"></button>
+<button class="btn" style="left:12%;top:1%;width:11%;height:7%" onclick="control('shop')" aria-label="المتجر"></button>
+<button class="btn" style="left:24%;top:2%;width:24%;height:5%" onclick="control('coins')" aria-label="العملات"></button>
+<button class="btn" style="left:50%;top:1%;width:28%;height:6%" onclick="control('gems')" aria-label="الجواهر"></button>
+<button class="btn" style="left:82%;top:0%;width:17%;height:10%" onclick="control('profile')" aria-label="الملف الشخصي"></button>
 
-<!-- أزرار اللعب الرئيسية -->
-<div class="game-buttons">
+<!-- الجانب -->
+<button class="btn" style="left:1%;top:9%;width:19%;height:12%" onclick="control('tournament')" aria-label="البطولة"></button>
+<button class="btn" style="left:82%;top:10%;width:17%;height:9%" onclick="control('ranking')" aria-label="الترتيب"></button>
+<button class="btn" style="left:83%;top:19%;width:16%;height:10%" onclick="control('heroes')" aria-label="لوحة الأبطال"></button>
 
-  <button class="game-btn purple"
-  onclick="action('تحدي الأصدقاء')">
-    <span>♟️</span>
-    تحدي الأصدقاء
-    <small>العب مع أصدقائك</small>
-  </button>
+<!-- أزرار اللعب -->
+<button class="btn" style="left:2%;top:48%;width:47%;height:18%" onclick="control('friends')" aria-label="تحدي الأصدقاء"></button>
+<button class="btn" style="left:51%;top:48%;width:47%;height:18%" onclick="control('computer')" aria-label="اللعب ضد الكمبيوتر"></button>
 
-  <button class="game-btn blue"
-  onclick="action('اللعب ضد الكمبيوتر')">
-    <span>🤖</span>
-    اللعب ضد الكمبيوتر
-    <small>منافسة ذكية</small>
-  </button>
+<button class="btn" style="left:2%;top:67%;width:47%;height:19%" onclick="control('online')" aria-label="اللعب أونلاين"></button>
+<button class="btn" style="left:51%;top:67%;width:47%;height:19%" onclick="control('quick')" aria-label="لعبة سريعة"></button>
 
-  <button class="game-btn green"
-  onclick="action('اللعب أونلاين')">
-    <span>🌍</span>
-    اللعب أونلاين
-    <small>لاعبين من العالم</small>
-  </button>
-
-  <button class="game-btn orange"
-  onclick="action('لعبة سريعة')">
-    <span>⏱️</span>
-    لعبة سريعة
-    <small>مباريات سريعة</small>
-  </button>
-
-</div>
-
-<!-- شريط التنقل السفلي -->
-<div class="bottom-buttons">
-
-  <button class="nav-btn"
-  onclick="action('المتجر')">
-    <span>🏪</span>
-    المتجر
-  </button>
-
-  <button class="nav-btn"
-  onclick="action('المخزون')">
-    <span>🎒</span>
-    المخزون
-  </button>
-
-  <button class="nav-btn home"
-  onclick="action('الرئيسية')">
-    <span>🏠</span>
-    الرئيسية
-  </button>
-
-  <button class="nav-btn"
-  onclick="action('الإحصائيات')">
-    <span>📊</span>
-    الإحصائيات
-  </button>
-
-  <button class="nav-btn"
-  onclick="action('الإنجازات')">
-    <span>🏆</span>
-    الإنجازات
-  </button>
+<!-- الشريط السفلي -->
+<button class="btn" style="left:1%;top:88%;width:20%;height:11%" onclick="control('store')" aria-label="المتجر"></button>
+<button class="btn" style="left:21%;top:88%;width:19%;height:11%" onclick="control('inventory')" aria-label="المخزون"></button>
+<button class="btn" style="left:40%;top:87%;width:21%;height:12%" onclick="control('home')" aria-label="الرئيسية"></button>
+<button class="btn" style="left:61%;top:88%;width:19%;height:11%" onclick="control('statistics')" aria-label="الإحصائيات"></button>
+<button class="btn" style="left:80%;top:88%;width:19%;height:11%" onclick="control('achievements')" aria-label="الإنجازات"></button>
 
 </div>
 
 <script>
-function action(name) {
-  console.log("تم الضغط على: " + name);
+function control(name) {
+  console.log("Button:", name);
+
+  // اربط كل زر بوظيفته هنا
+  if(name === 'home') {
+    console.log('الرئيسية');
+  }
 }
 </script>
 
