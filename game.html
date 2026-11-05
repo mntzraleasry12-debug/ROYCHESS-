@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>شطرنج الوحوش 3D - اللعبة</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; font-family: 'Cairo', sans-serif; }
+        body { background-color: #05020a; color: white; overflow: hidden; width: 100vw; height: 100vh; }
+
+        /* --- شاشة اختيار النمط (تظهر قبل بدء اللعب) --- */
+        #mode-selection {
+            position: absolute; inset: 0; background: rgba(10,5,20,0.95); z-index: 100;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+        .mode-title { font-size: 30px; font-weight: 900; color: #ffd700; margin-bottom: 30px; text-shadow: 0 0 15px #ffd700; }
+        .mode-btn {
+            width: 80%; max-width: 300px; padding: 15px; margin: 10px;
+            background: linear-gradient(to bottom, #4a1c72, #220a38); border: 2px solid #8b5cf6;
+            color: white; font-size: 18px; font-weight: bold; border-radius: 12px; cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5); transition: transform 0.1s;
+        }
+        .mode-btn:active { transform: scale(0.95); }
+
+        /* --- واجهة اللعب --- */
+        #game-container { position: absolute; inset: 0; display: none; }
+        #game { width: 100%; height: 100%; touch-action: none; }
+        
+        #ui-layer { position: absolute; top: 0; left: 0; right: 0; padding: 10px; pointer-events: none; display: flex; justify-content: space-between; align-items: flex-start; }
+        #status { background: rgba(0,0,0,0.7); color: #fff; padding: 8px 16px; border-radius: 20px; font-size: 15px; font-weight: bold; border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(5px); }
+        .game-coins { background: rgba(0,0,0,0.8); border: 2px solid #ffd700; color: #ffd700; padding: 5px 15px; border-radius: 20px; font-weight: 900; font-size: 16px; display: flex; align-items: center; gap: 5px; pointer-events: auto; }
+        
+        .controls { display: flex; gap: 10px; pointer-events: auto; position: absolute; top: 55px; right: 10px; }
+        .icon-btn { background: rgba(0,0,0,0.7); color: white; border: 1px solid rgba(255,255,255,0.3); width: 44px; height: 44px; border-radius: 50%; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+
+        /* --- شاشة الفوز والخسارة --- */
+        #end-screen { display: none; position: absolute; inset: 0; background: rgba(0,0,0,0.85); z-index: 200; flex-direction: column; justify-content: center; align-items: center; text-align: center; backdrop-filter: blur(8px); }
+        #end-screen h2 { font-size: 45px; color: #ffd700; text-shadow: 0 0 20px #ffd700; margin-bottom: 10px; }
+        #end-screen p { font-size: 22px; margin-bottom: 30px; color: #e9d5ff; }
+        .btn-back { background: linear-gradient(to bottom, #6b5b7a, #2d1b40); color: white; border: 2px solid #8b5cf6; padding: 15px 40px; font-size: 20px; border-radius: 12px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.5); margin-top: 10px; }
+
+        /* --- تأثيرات العملات --- */
+        #fx-container { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 150; }
+        .floating-coin { position: absolute; color: #ffd700; font-size: 28px; font-weight: 900; text-shadow: 0 0 10px #ffd700, 0 2px 4px #000; pointer-events: none; animation: flyUp 1s ease-out forwards; }
+        @keyframes flyUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-100px) scale(1.5); } }
+    </style>
+</head>
+<body>
+
+    <!-- شاشة اختيار النمط -->
+    <div id="mode-selection">
+        <h1 class="mode-title">اختر نمط اللعب</h1>
+        <button class="mode-btn" onclick="startMode('easy')">🟢 ضد الكمبيوتر (سهل)</button>
+        <button class="mode-btn" onclick="startMode('medium')">🟡 ضد الكمبيوتر (متوسط)</button>
+        <button class="mode-btn" onclick="startMode('hard')">🔴 ضد الكمبيوتر (صعب)</button>
+        <button class="mode-btn" onclick="startMode('quick')">⚡ لعبة سريعة (5 دقائق)</button>
+        <button class="mode-btn" onclick="onlineMsg()" style="border-color: #ff4d4d;">🌍 اللعب أونلاين</button>
+        <button class="mode-btn" onclick="friendsMsg()" style="border-color: #3b82f6;">👥 تحدي الأصدقاء (فيسبوك)</button>
+        <button class="mode-btn" onclick="window.location.href='index.html'" style="margin-top: 20px; background: #333;">العودة للرئيسية</button>
+    </div>
+
+    <!-- حاوية اللعبة -->
+    <div id="game-container">
+        <div id="game"></div>
+        <div id="fx-container"></div>
+        
+        <div id="ui-layer">
+            <div id="status">جاري التحميل...</div>
+            <div class="game-coins">🪙 <span id="game-coins">0</span></div>
+            <div class="controls">
+                <button class="icon-btn" onclick="window.location.href='index.html'" title="القائمة">🏠</button>
+                <button class="icon-btn" onclick="location.reload()" title="إعادة">🔄</button>
+            </div>
+        </div>
+        
+        <div id="end-screen">
+            <h2 id="end-title">🏆 فوز!</h2>
+            <p id="end-msg">لقد حصلت على مكافأة!</p>
+            <button class="btn-back" onclick="window.location.href='index.html'">العودة للقائمة</button>
+        </div>
+    </div>
+
+    <!-- المكتبات -->
+    <script type="importmap">
+    {"imports":{
+     "three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+     "OrbitControls":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/controls/OrbitControls.js",
+     "chess":"https://cdn.jsdelivr.net/npm/chess.js@1.4.0/dist/esm/chess.js"}}
+    </script>
+
+    <script type="module">
+    import * as T from "three";
+    import {OrbitControls} from "OrbitControls";
+    import {Chess} from "chess";
+
+    const chess = new Chess();
+    const files = "abcdefgh";
+    const $ = id => document.getElementById(id);
+
+    // =========================================
+    // 🎁 نظام المكافآت
+    // =========================================
+    let totalCoins = parseInt(localStorage.getItem('monsterChessCoins')) || 0;
+    const REWARDS = { p: 5, n: 15, b: 15, r: 25, q: 50, k: 0 };
+    const WIN_BONUS = 100;
+
+    function updateCoinUI() { $('game-coins').textContent = totalCoins; }
+    function addCoins(amount, x = window.innerWidth/2, y = window.innerHeight/2) {
+        totalCoins += amount; localStorage.setItem('monsterChessCoins', totalCoins);
+        updateCoinUI(); showFloatingText(amount, x, y);
+    }
+    function showFloatingText(amount, x, y) {
+        const el = document.createElement('div'); el.className = 'floating-coin';
+        el.textContent = `+${amount} 🪙`; el.style.left = `${x}px`; el.style.top = `${y}px`;
+        $('fx-container').appendChild(el); setTimeout(() => el.remove(), 1000);
+    }
+    updateCoinUI();
+
+    // =========================================
+    // 🎮 إعداد المشهد (Three.js)
+    // =========================================
+    const scene = new T.Scene();
+    scene.background = new T.Color(0x0a0514);
+    scene.fog = new T.Fog(0x0a0514, 20, 50);
+    const camera = new T.PerspectiveCamera(45, 1, 0.1, 100);
+    camera.position.set(0, 13, 12); 
+
+    const renderer = new T.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    $("game").appendChild(renderer.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.target.set(0, 0, 0);
+    controls.enableDamping = true; controls.enablePan = false; 
+    controls.minDistance = 10; controls.maxDistance = 18; controls.minPolarAngle = Math.PI / 3; controls.maxPolarAngle = Math.PI / 2.4; controls.update();
+
+    const hemiLight = new T.HemisphereLight(0xffffff, 0x444444, 1.2); scene.add(hemiLight);
+    const sunLight = new T.DirectionalLight(0xfff5e6, 2); sunLight.position.set(10, 20, 10); sunLight.castShadow = true; scene.add(sunLight);
+
+    const ground = new T.Mesh(new T.PlaneGeometry(200, 200), new T.MeshStandardMaterial({ color: 0x1a1a2e, roughness: 1 }));
+    ground.rotation.x = -Math.PI / 2; ground.position.y = -0.6; ground.receiveShadow = true; scene.add(ground);
+
+    const boardGroup = new T.Group(); scene.add(boardGroup);
+    const border = new T.Mesh(new T.BoxGeometry(9.2, 0.4, 9.2), new T.MeshStandardMaterial({ color: 0x2a1b38, roughness: 0.4 }));
+    border.position.y = -0.2; border.receiveShadow = true; boardGroup.add(border);
+
+    const lightMat = new T.MeshStandardMaterial({ color: 0xd8b4fe, roughness: 0.3 }); 
+    const darkMat = new T.MeshStandardMaterial({ color: 0x3b1d60, roughness: 0.3 }); 
+    const selectedMat = new T.MeshStandardMaterial({ color: 0xffd700, roughness: 0.2 }); 
+    const squares = [];
+
+    for (let r = 0; r < 8; r++) {
+        for (let f = 0; f < 8; f++) {
+            const rank = 8 - r; const isDark = (f + (rank - 1)) % 2 === 0; 
+            const square = new T.Mesh(new T.BoxGeometry(1, 0.1, 1), isDark ? darkMat : lightMat);
+            square.position.set(f - 3.5, 0, r - 3.5); square.receiveShadow = true;
+            square.userData.square = files[f] + rank; squares.push(square); boardGroup.add(square);
+        }
+    }
+
+    const piecesGroup = new T.Group(); scene.add(piecesGroup);
+    const pieceMaterials = { w: new T.MeshStandardMaterial({ color: 0xe0e0ff, roughness: 0.2, metalness: 0.5 }), b: new T.MeshStandardMaterial({ color: 0x1a0033, roughness: 0.4, metalness: 0.8 }) };
+
+    function createModernPiece(type, color) {
+        const g = new T.Group(); const mat = pieceMaterials[color];
+        const addPart = (geo, y, scaleX = 1, scaleY = 1, scaleZ = 1) => {
+            const mesh = new T.Mesh(geo, mat); mesh.position.y = y; mesh.scale.set(scaleX, scaleY, scaleZ);
+            mesh.castShadow = true; mesh.receiveShadow = true; g.add(mesh); return mesh;
+        };
+        addPart(new T.CylinderGeometry(0.4, 0.45, 0.15, 32), 0.075); addPart(new T.CylinderGeometry(0.3, 0.4, 0.1, 32), 0.2);
+        switch (type) {
+            case "p": addPart(new T.CylinderGeometry(0.15, 0.25, 0.5, 32), 0.5); addPart(new T.SphereGeometry(0.2, 32, 16), 0.85); break;
+            case "r": addPart(new T.CylinderGeometry(0.25, 0.3, 0.6, 32), 0.55); addPart(new T.CylinderGeometry(0.35, 0.35, 0.15, 32), 0.9); break;
+            case "n": addPart(new T.CylinderGeometry(0.15, 0.25, 0.6, 32), 0.5); const head = addPart(new T.BoxGeometry(0.3, 0.4, 0.2), 0.95); head.rotation.x = -0.5; head.position.z = 0.1; break;
+            case "b": addPart(new T.CylinderGeometry(0.15, 0.25, 0.6, 32), 0.5); addPart(new T.SphereGeometry(0.25, 32, 16), 0.85); addPart(new T.ConeGeometry(0.15, 0.3, 32), 1.15); break;
+            case "q": addPart(new T.CylinderGeometry(0.15, 0.25, 0.7, 32), 0.6); addPart(new T.TorusGeometry(0.2, 0.05, 16, 32), 0.95); addPart(new T.SphereGeometry(0.1, 16, 16), 1.1); break;
+            case "k": addPart(new T.CylinderGeometry(0.15, 0.25, 0.8, 32), 0.65); addPart(new T.TorusGeometry(0.2, 0.05, 16, 32), 1.05); addPart(new T.BoxGeometry(0.08, 0.3, 0.08), 1.25); addPart(new T.BoxGeometry(0.2, 0.08, 0.08), 1.3); break;
+        }
+        return g;
+    }
+
+    const getSquarePos = (sq) => { return { x: files.indexOf(sq[0]) - 3.5, z: (8 - parseInt(sq[1])) - 3.5 }; };
+    let selectedSquare = null; let thinking = false; let currentMode = 'medium';
+    const marksGroup = new T.Group(); scene.add(marksGroup);
+
+    function drawBoard() {
+        piecesGroup.children.forEach(child => { child.traverse(c => { if (c.geometry) c.geometry.dispose(); }); });
+        piecesGroup.clear();
+        chess.board().forEach((row, r) => {
+            row.forEach((piece, f) => {
+                if (!piece) return;
+                const squareName = files[f] + (8 - r); const pieceMesh = createModernPiece(piece.type, piece.color);
+                const pos = getSquarePos(squareName); pieceMesh.position.set(pos.x, 0.05, pos.z);
+                pieceMesh.userData = { square: squareName, color: piece.color }; piecesGroup.add(pieceMesh);
+            });
+        });
+    }
+
+    function highlightSquares() {
+        squares.forEach(sq => { const f = files.indexOf(sq.userData.square[0]); const rank = parseInt(sq.userData.square[1]); sq.material = ((f + (rank - 1)) % 2 === 0) ? darkMat : lightMat; });
+        marksGroup.clear();
+        if (!selectedSquare) return;
+        const selSq = squares.find(s => s.userData.square === selectedSquare); if (selSq) selSq.material = selectedMat; 
+        chess.moves({ square: selectedSquare, verbose: true }).forEach(m => {
+            const pos = getSquarePos(m.to); const isCapture = m.flags.includes('c') || m.flags.includes('e');
+            const markMat = new T.MeshStandardMaterial({ color: isCapture ? 0xFF4500 : 0x00FF7F, emissive: isCapture ? 0xFF4500 : 0x00FF7F, emissiveIntensity: 0.5, transparent: true, opacity: 0.8 });
+            const mark = new T.Mesh(isCapture ? new T.TorusGeometry(0.4, 0.05, 16, 32) : new T.CylinderGeometry(0.15, 0.15, 0.02, 16), markMat);
+            mark.position.set(pos.x, 0.06, pos.z); if (isCapture) mark.rotation.x = Math.PI / 2; marksGroup.add(mark);
+        });
+    }
+
+    function updateStatus() {
+        const statusEl = $("status");
+        if (chess.isCheckmate()) { 
+            statusEl.textContent = "🏆 كش مات!"; 
+            $("end-title").textContent = "🏆 فوز ساحق!";
+            $("end-msg").textContent = `لقد حصلت على ${WIN_BONUS} عملة!`;
+            addCoins(WIN_BONUS, window.innerWidth/2, window.innerHeight/2 - 100); 
+            setTimeout(() => { $("end-screen").style.display = "flex"; }, 1000); 
+            return true; 
+        }
+        if (chess.isDraw()) { 
+            statusEl.textContent = "🤝 تعادل!"; 
+            $("end-title").textContent = "🤝 تعادل";
+            $("end-msg").textContent = "مباراة جيدة!";
+            setTimeout(() => { $("end-screen").style.display = "flex"; }, 1000); 
+            return true; 
+        }
+        if (chess.isCheck()) { statusEl.textContent = "⚠️ كش! الملك مهدد"; return false; }
+        statusEl.textContent = chess.turn() === "w" ? "دورك (الأبيض)" : "الكمبيوتر يفكر..."; return false;
+    }
+
+    // =========================================
+    // 🤖 الذكاء الاصطناعي (3 مستويات)
+    // =========================================
+    const pieceValues = { p: 100, n: 320, b: 330, r: 500, q: 900, k: 20000 };
+    function evaluateBoard() { 
+        let score = 0; 
+        chess.board().forEach((row, r) => row.forEach((piece, f) => { 
+            if (!piece) return; 
+            let val = pieceValues[piece.type]; 
+            if (piece.type === "p") val += (piece.color === "b" ? r : 7 - r) * 4; 
+            val += (7 - (Math.abs(3.5 - f) + Math.abs(3.5 - r))) * 2; 
+            score += piece.color === "b" ? val : -val; 
+        })); 
+        return score; 
+    }
+    
+    function minimax(depth, alpha, beta, isMax) { 
+        if (depth === 0 || chess.isGameOver()) return evaluateBoard(); 
+        let best = isMax ? -Infinity : Infinity; 
+        for (const move of chess.moves()) { 
+            chess.move(move); 
+            const val = minimax(depth - 1, alpha, beta, !isMax); 
+            chess.undo(); 
+            if (isMax) { best = Math.max(best, val); alpha = Math.max(alpha, best); } 
+            else { best = Math.min(best, val); beta = Math.min(beta, best); } 
+            if (beta <= alpha) break; 
+        } 
+        return best; 
+    }
+
+    function computerMove() {
+        if (chess.isGameOver()) return;
+        const moves = chess.moves(); 
+        let bestMove = null; 
+        
+        if (currentMode === 'easy') {
+            // سهل: يلعب حركة عشوائية
+            bestMove = moves[Math.floor(Math.random() * moves.length)];
+        } else {
+            // متوسط وصعب: يستخدم خوارزمية Minimax
+            let depth = currentMode === 'hard' ? 3 : 2;
+            let bestVal = -Infinity; 
+            for (const move of moves) { 
+                chess.move(move); 
+                const val = minimax(depth - 1, -Infinity, Infinity, false) + Math.random(); // عشوائية بسيطة
+                chess.undo(); 
+                if (val > bestVal) { bestVal = val; bestMove = move; } 
+            }
+        }
+
+        if (bestMove) { 
+            chess.move(bestMove); 
+            drawBoard(); 
+            updateStatus(); 
+            thinking = false; 
+        }
+    }
+
+    // =========================================
+    // 👆 التفاعل
+    // =========================================
+    let touchStart = null;
+    renderer.domElement.addEventListener("pointerdown", e => touchStart = [e.clientX, e.clientY]);
+    renderer.domElement.addEventListener("pointerup", e => { if (!touchStart || Math.hypot(e.clientX - touchStart[0], e.clientY - touchStart[1]) > 10) return; handleTap(e); });
+    const raycaster = new T.Raycaster(); const mouse = new T.Vector2();
+
+    function handleTap(e) {
+        if (thinking || chess.isGameOver() || chess.turn() !== "w") return;
+        const rect = renderer.domElement.getBoundingClientRect();
+        mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1; mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObjects([...piecesGroup.children, ...squares], true);
+        let clickedSquare = null;
+        for (const hit of intersects) { let obj = hit.object; while (obj && !obj.userData.square) obj = obj.parent; if (obj) { clickedSquare = obj.userData.square; break; } }
+        if (!clickedSquare) return;
+        const piece = chess.get(clickedSquare);
+        if (piece && piece.color === "w") { selectedSquare = clickedSquare; highlightSquares(); return; }
+        if (!selectedSquare) return;
+        const validMove = chess.moves({ square: selectedSquare, verbose: true }).find(m => m.to === clickedSquare);
+        if (!validMove) return;
+        
+        const targetPiece = chess.get(clickedSquare);
+        executeMove(selectedSquare, clickedSquare, "q", targetPiece, e.clientX, e.clientY);
+    }
+
+    function executeMove(from, to, promotion, capturedPiece, clickX, clickY) {
+        chess.move({ from, to, promotion }); 
+        selectedSquare = null; highlightSquares(); drawBoard(); 
+        
+        if (capturedPiece) {
+            const reward = REWARDS[capturedPiece.type] || 0;
+            if (reward > 0) addCoins(reward, clickX, clickY);
+        }
+
+        if (updateStatus()) return;
+        thinking = true; setTimeout(() => computerMove(), 300);
+    }
+
+    // =========================================
+    // 🚀 بدء اللعبة وإدارة الأنماط
+    // =========================================
+    window.startMode = (mode) => {
+        currentMode = mode;
+        $('mode-selection').style.display = 'none';
+        $('game-container').style.display = 'block';
+        chess.reset(); 
+        selectedSquare = null; thinking = false; 
+        $("end-screen").style.display = "none"; 
+        highlightSquares(); drawBoard(); updateStatus();
+        requestAnimationFrame(() => { resize(); });
+    };
+
+    window.onlineMsg = () => alert("🌍 اللعب أونلاين يتطلب ربط اللعبة بسيرفر (Backend) مثل Firebase. هذا الخيار قيد التطوير حالياً!");
+    window.friendsMsg = () => alert("👥 تحدي الأصدقاء عبر فيسبوك يتطلب إنشاء تطبيق (Facebook App) وربطه بسيرفر. هذا الخيار قيد التطوير حالياً!");
+
+    function resize() {
+        const w = $("game").clientWidth; const h = $("game").clientHeight;
+        if (w === 0 || h === 0) return;
+        renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix();
+    }
+    window.addEventListener("resize", resize);
+
+    let time = 0;
+    renderer.setAnimationLo
