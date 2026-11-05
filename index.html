@@ -28,8 +28,8 @@
         #main-menu {
             position: absolute;
             inset: 0;
-            /* ⚠️ غير الاسم هنا إذا كانت صورتك png */
-            background-image: url('menu.jpg'); 
+            /* ✅ تم تصحيح الامتداد هنا إلى png ليطابق صورتك */
+            background-image: url('menu.png'); 
             background-size: 100% 100%;
             background-position: center;
             background-repeat: no-repeat;
@@ -69,7 +69,7 @@
         .nav-home { bottom: 0; left: 75%; width: 25%; height: 9%; } 
 
         /* =========================================
-           عدادات تفاعلية فوق الصورة (تغطي الأرقام الثابتة)
+           عدادات تفاعلية فوق الصورة
            ========================================= */
         .dynamic-counter {
             position: absolute;
@@ -81,7 +81,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(0,0,0,0.7); /* خلفية سوداء شفافة تغطي الرقم القديم */
+            background: rgba(0,0,0,0.7);
             border-radius: 10px;
             padding: 0 5px;
             height: 20px;
@@ -99,7 +99,7 @@
             background: rgba(0, 0, 0, 0.85);
             backdrop-filter: blur(5px);
             z-index: 100;
-            display: none; /* مخفية افتراضياً */
+            display: none; 
             justify-content: center;
             align-items: center;
         }
@@ -133,7 +133,6 @@
         .modal-header h2 { font-size: 20px; color: #ffd700; text-shadow: 0 0 10px #ffd700; }
         .close-btn { background: none; border: none; color: #ff4d4d; font-size: 24px; cursor: pointer; font-weight: bold; }
 
-        /* تصميم عناصر النوافذ */
         .item-list { display: flex; flex-direction: column; gap: 10px; max-height: 60vh; overflow-y: auto; }
         .list-item {
             background: rgba(255,255,255,0.05);
@@ -161,7 +160,6 @@
         .action-btn:active { transform: scale(0.95); }
         .action-btn:disabled { background: #555; color: #aaa; cursor: not-allowed; box-shadow: none; }
 
-        /* التبويبات (Settings) */
         .setting-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #333; }
         .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -174,16 +172,11 @@
 </head>
 <body>
 
-    <!-- =========================================
-         الواجهة الرئيسية
-         ========================================= -->
     <div id="main-menu">
-        <!-- عدادات تفاعلية تغطي الأرقام في الصورة -->
         <div class="dynamic-counter" id="ui-name">منتظر احمد</div>
         <div class="dynamic-counter" id="ui-gold">0</div>
         <div class="dynamic-counter" id="ui-gems">0</div>
 
-        <!-- الأزرار الشفافة -->
         <!-- الشريط العلوي -->
         <div class="hotspot btn-profile" onclick="openModal('modal-profile')"></div>
         <div class="hotspot btn-gold-plus" onclick="openModal('modal-store')"></div>
@@ -214,24 +207,17 @@
         <div class="hotspot nav-home" onclick="closeAllModals()"></div>
     </div>
 
-    <!-- =========================================
-         النوافذ المنبثقة (Modals)
-         ========================================= -->
-
-    <!-- 1. المهام اليومية -->
+    <!-- النوافذ المنبثقة -->
     <div class="modal-overlay" id="modal-quests">
         <div class="modal-content">
             <div class="modal-header">
                 <h2>📜 المهام اليومية</h2>
                 <button class="close-btn" onclick="closeAllModals()">×</button>
             </div>
-            <div class="item-list" id="quests-list">
-                <!-- سيتم توليد المهام هنا بالجافاسكريبت -->
-            </div>
+            <div class="item-list" id="quests-list"></div>
         </div>
     </div>
 
-    <!-- 2. الرسائل -->
     <div class="modal-overlay" id="modal-mail">
         <div class="modal-content">
             <div class="modal-header">
@@ -255,7 +241,6 @@
         </div>
     </div>
 
-    <!-- 3. الإعدادات -->
     <div class="modal-overlay" id="modal-settings">
         <div class="modal-content">
             <div class="modal-header">
@@ -277,7 +262,6 @@
         </div>
     </div>
 
-    <!-- 4. الملف الشخصي -->
     <div class="modal-overlay" id="modal-profile">
         <div class="modal-content" style="text-align:center;">
             <div class="modal-header">
@@ -294,7 +278,6 @@
         </div>
     </div>
 
-    <!-- 5. المتجر -->
     <div class="modal-overlay" id="modal-store">
         <div class="modal-content">
             <div class="modal-header">
@@ -318,7 +301,6 @@
         </div>
     </div>
 
-    <!-- 6. المخزون -->
     <div class="modal-overlay" id="modal-inventory">
         <div class="modal-content">
             <div class="modal-header">
@@ -331,12 +313,8 @@
         </div>
     </div>
 
-
-    <!-- =========================================
-         الجافاسكريبت (المنطق)
-         ========================================= -->
+    <!-- الجافاسكريبت -->
     <script>
-        // --- 1. الحالة الأساسية للعبة (تُحفظ في المتصفح) ---
         let playerData = {
             gold: parseInt(localStorage.getItem('playerGold')) || 125750,
             gems: parseInt(localStorage.getItem('playerGems')) || 2340,
@@ -348,22 +326,17 @@
             ]
         };
 
-        // تحديث الأرقام في الواجهة الرئيسية
         function updateUI() {
             document.getElementById('ui-gold').innerText = playerData.gold.toLocaleString();
             document.getElementById('ui-gems').innerText = playerData.gems.toLocaleString();
-            
-            // حفظ التحديثات في المتصفح
             localStorage.setItem('playerGold', playerData.gold);
             localStorage.setItem('playerGems', playerData.gems);
             localStorage.setItem('playerInventory', JSON.stringify(playerData.inventory));
         }
 
-        // --- 2. التحكم بالنوافذ (Modals) ---
         function openModal(id) {
-            closeAllModals(); // إغلاق أي نافذة مفتوحة
+            closeAllModals(); 
             document.getElementById(id).style.display = 'flex';
-            
             if (id === 'modal-quests') renderQuests();
             if (id === 'modal-inventory') renderInventory();
         }
@@ -374,15 +347,12 @@
             });
         }
 
-        // --- 3. المهام اليومية ---
         function renderQuests() {
             const list = document.getElementById('quests-list');
             list.innerHTML = '';
-            
             playerData.quests.forEach(q => {
                 const item = document.createElement('div');
                 item.className = 'list-item';
-                
                 let btnHTML = '';
                 if (q.claimed) {
                     btnHTML = `<button class="action-btn" disabled>تم الاستلام</button>`;
@@ -391,7 +361,6 @@
                 } else {
                     btnHTML = `<button class="action-btn" disabled>غير مكتمل</button>`;
                 }
-
                 item.innerHTML = `
                     <div>
                         <h3>${q.text}</h3>
@@ -414,7 +383,6 @@
             }
         }
 
-        // --- 4. المتجر والمخزون ---
         function buyItem(amount, type) {
             if (type === 'gold') {
                 if (playerData.gems >= 50) {
@@ -423,16 +391,14 @@
                     updateUI();
                     alert('تم شراء الذهب بنجاح!');
                 } else { alert('جواهر غير كافية!'); }
-            } 
-            else if (type === 'gems') {
+            } else if (type === 'gems') {
                 if (playerData.gold >= 5000) {
                     playerData.gold -= 5000;
                     playerData.gems += amount;
                     updateUI();
                     alert('تم شراء الجواهر بنجاح!');
                 } else { alert('ذهب غير كافي!'); }
-            }
-            else if (type === 'skin') {
+            } else if (type === 'skin') {
                 if (playerData.gold >= 2000) {
                     playerData.gold -= 2000;
                     playerData.inventory.push('جلد أسطوري');
@@ -458,18 +424,14 @@
             }
         }
 
-        // --- 5. المكافأة اليومية ---
         function claimDailyChest() {
-            // في الواقع، يجب أن يكون هناك فحص للوقت (كل 24 ساعة). هنا نجعله بسيطاً.
-            const randomGold = Math.floor(Math.random() * 500) + 500; // بين 500 و 1000
+            const randomGold = Math.floor(Math.random() * 500) + 500;
             playerData.gold += randomGold;
             updateUI();
             alert(`🎉 مبروك! لقد فتحت الصندوق اليومي وحصلت على ${randomGold} ذهب!`);
         }
 
-        // تشغيل التحديث عند فتح الصفحة
         updateUI();
-
     </script>
 </body>
-</html>
+    </html>
