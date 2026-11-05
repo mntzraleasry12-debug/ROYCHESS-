@@ -9,55 +9,55 @@
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; font-family: 'Cairo', sans-serif; }
         body { background-color: #05020a; color: white; overflow: hidden; width: 100vw; height: 100vh; }
 
-        /* --- شاشة اختيار النمط (تظهر قبل بدء اللعب) --- */
+        /* --- شاشة اختيار النمط --- */
         #mode-selection {
-            position: absolute; inset: 0; background: rgba(10,5,20,0.95); z-index: 100;
+            position: absolute; inset: 0; background: rgba(10,5,20,0.98); z-index: 100;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
-        .mode-title { font-size: 30px; font-weight: 900; color: #ffd700; margin-bottom: 30px; text-shadow: 0 0 15px #ffd700; }
+        .mode-title { font-size: 28px; font-weight: 900; color: #ffd700; margin-bottom: 20px; text-shadow: 0 0 15px #ffd700; }
         .mode-btn {
-            width: 80%; max-width: 300px; padding: 15px; margin: 10px;
+            width: 85%; max-width: 320px; padding: 12px; margin: 6px;
             background: linear-gradient(to bottom, #4a1c72, #220a38); border: 2px solid #8b5cf6;
-            color: white; font-size: 18px; font-weight: bold; border-radius: 12px; cursor: pointer;
+            color: white; font-size: 16px; font-weight: bold; border-radius: 12px; cursor: pointer;
             box-shadow: 0 4px 10px rgba(0,0,0,0.5); transition: transform 0.1s;
         }
         .mode-btn:active { transform: scale(0.95); }
 
         /* --- واجهة اللعب --- */
-        #game-container { position: absolute; inset: 0; display: none; }
+        #game-container { position: absolute; inset: 0; display: none; background: #000; }
         #game { width: 100%; height: 100%; touch-action: none; }
         
-        #ui-layer { position: absolute; top: 0; left: 0; right: 0; padding: 10px; pointer-events: none; display: flex; justify-content: space-between; align-items: flex-start; }
-        #status { background: rgba(0,0,0,0.7); color: #fff; padding: 8px 16px; border-radius: 20px; font-size: 15px; font-weight: bold; border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(5px); }
-        .game-coins { background: rgba(0,0,0,0.8); border: 2px solid #ffd700; color: #ffd700; padding: 5px 15px; border-radius: 20px; font-weight: 900; font-size: 16px; display: flex; align-items: center; gap: 5px; pointer-events: auto; }
+        #ui-layer { position: absolute; top: 0; left: 0; right: 0; padding: 10px; pointer-events: none; display: flex; justify-content: space-between; align-items: flex-start; z-index: 10; }
+        #status { background: rgba(0,0,0,0.8); color: #fff; padding: 6px 12px; border-radius: 20px; font-size: 14px; font-weight: bold; border: 1px solid #8b5cf6; }
         
-        .controls { display: flex; gap: 10px; pointer-events: auto; position: absolute; top: 55px; right: 10px; }
-        .icon-btn { background: rgba(0,0,0,0.7); color: white; border: 1px solid rgba(255,255,255,0.3); width: 44px; height: 44px; border-radius: 50%; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .game-coins { background: rgba(0,0,0,0.8); border: 2px solid #ffd700; color: #ffd700; padding: 4px 12px; border-radius: 20px; font-weight: 900; font-size: 15px; display: flex; align-items: center; gap: 5px; pointer-events: auto; }
+        
+        .controls { display: flex; gap: 8px; pointer-events: auto; position: absolute; top: 50px; right: 10px; }
+        .icon-btn { background: rgba(0,0,0,0.8); color: white; border: 1px solid #8b5cf6; width: 40px; height: 40px; border-radius: 50%; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
-        /* --- شاشة الفوز والخسارة --- */
-        #end-screen { display: none; position: absolute; inset: 0; background: rgba(0,0,0,0.85); z-index: 200; flex-direction: column; justify-content: center; align-items: center; text-align: center; backdrop-filter: blur(8px); }
-        #end-screen h2 { font-size: 45px; color: #ffd700; text-shadow: 0 0 20px #ffd700; margin-bottom: 10px; }
-        #end-screen p { font-size: 22px; margin-bottom: 30px; color: #e9d5ff; }
-        .btn-back { background: linear-gradient(to bottom, #6b5b7a, #2d1b40); color: white; border: 2px solid #8b5cf6; padding: 15px 40px; font-size: 20px; border-radius: 12px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.5); margin-top: 10px; }
+        /* --- شاشة النهاية --- */
+        #end-screen { display: none; position: absolute; inset: 0; background: rgba(0,0,0,0.9); z-index: 200; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        #end-screen h2 { font-size: 40px; color: #ffd700; margin-bottom: 10px; }
+        #end-screen p { font-size: 20px; margin-bottom: 30px; color: #e9d5ff; }
+        .btn-back { background: linear-gradient(to bottom, #6b5b7a, #2d1b40); color: white; border: 2px solid #8b5cf6; padding: 12px 30px; font-size: 18px; border-radius: 12px; font-weight: bold; cursor: pointer; }
 
         /* --- تأثيرات العملات --- */
         #fx-container { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 150; }
-        .floating-coin { position: absolute; color: #ffd700; font-size: 28px; font-weight: 900; text-shadow: 0 0 10px #ffd700, 0 2px 4px #000; pointer-events: none; animation: flyUp 1s ease-out forwards; }
+        .floating-coin { position: absolute; color: #ffd700; font-size: 24px; font-weight: 900; text-shadow: 0 0 10px #ffd700, 0 2px 4px #000; pointer-events: none; animation: flyUp 1s ease-out forwards; }
         @keyframes flyUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-100px) scale(1.5); } }
     </style>
 </head>
 <body>
 
-    <!-- شاشة اختيار النمط -->
+    <!-- شاشة الاختيار -->
     <div id="mode-selection">
         <h1 class="mode-title">اختر نمط اللعب</h1>
         <button class="mode-btn" onclick="startMode('easy')">🟢 ضد الكمبيوتر (سهل)</button>
         <button class="mode-btn" onclick="startMode('medium')">🟡 ضد الكمبيوتر (متوسط)</button>
         <button class="mode-btn" onclick="startMode('hard')">🔴 ضد الكمبيوتر (صعب)</button>
-        <button class="mode-btn" onclick="startMode('quick')">⚡ لعبة سريعة (5 دقائق)</button>
-        <button class="mode-btn" onclick="onlineMsg()" style="border-color: #ff4d4d;">🌍 اللعب أونلاين</button>
-        <button class="mode-btn" onclick="friendsMsg()" style="border-color: #3b82f6;">👥 تحدي الأصدقاء (فيسبوك)</button>
-        <button class="mode-btn" onclick="window.location.href='index.html'" style="margin-top: 20px; background: #333;">العودة للرئيسية</button>
+        <button class="mode-btn" onclick="startMode('quick')">⚡ لعبة سريعة</button>
+        <button class="mode-btn" onclick="alert('🌍 الأونلاين يتطلب سيرفر خارجي (Firebase) وهو قيد التطوير')" style="border-color: #ff4d4d; margin-top: 10px;">🌍 اللعب أونلاين</button>
+        <button class="mode-btn" onclick="window.location.href='index.html'" style="margin-top: 15px; background: #333; border-color: #555;">العودة للرئيسية</button>
     </div>
 
     <!-- حاوية اللعبة -->
@@ -81,7 +81,6 @@
         </div>
     </div>
 
-    <!-- المكتبات -->
     <script type="importmap">
     {"imports":{
      "three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
@@ -126,7 +125,7 @@
     const camera = new T.PerspectiveCamera(45, 1, 0.1, 100);
     camera.position.set(0, 13, 12); 
 
-    const renderer = new T.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+    const renderer = new T.WebGLRenderer({ antialias: true });
     renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
     $("game").appendChild(renderer.domElement);
@@ -213,14 +212,29 @@
 
     function updateStatus() {
         const statusEl = $("status");
+        
+        // إصلاح منطق الفوز والخسارة
         if (chess.isCheckmate()) { 
-            statusEl.textContent = "🏆 كش مات!"; 
-            $("end-title").textContent = "🏆 فوز ساحق!";
-            $("end-msg").textContent = `لقد حصلت على ${WIN_BONUS} عملة!`;
-            addCoins(WIN_BONUS, window.innerWidth/2, window.innerHeight/2 - 100); 
+            let winner = chess.turn() === 'w' ? 'الأسود (الكمبيوتر)' : 'الأبيض (أنت)';
+            
+            if (chess.turn() === 'w') {
+                // الكمبيوتر فاز
+                $("end-title").textContent = "💀 خسارة!";
+                $("end-msg").textContent = "حاول مرة أخرى!";
+                $("end-title").style.color = "#ff4d4d";
+            } else {
+                // أنت فزت
+                $("end-title").textContent = "🏆 فوز ساحق!";
+                $("end-msg").textContent = `لقد حصلت على ${WIN_BONUS} عملة!`;
+                $("end-title").style.color = "#ffd700";
+                addCoins(WIN_BONUS, window.innerWidth/2, window.innerHeight/2 - 100); 
+            }
+            
+            statusEl.textContent = "🏆 كش مات! " + winner + " فاز";
             setTimeout(() => { $("end-screen").style.display = "flex"; }, 1000); 
             return true; 
         }
+        
         if (chess.isDraw()) { 
             statusEl.textContent = "🤝 تعادل!"; 
             $("end-title").textContent = "🤝 تعادل";
@@ -229,11 +243,13 @@
             return true; 
         }
         if (chess.isCheck()) { statusEl.textContent = "⚠️ كش! الملك مهدد"; return false; }
-        statusEl.textContent = chess.turn() === "w" ? "دورك (الأبيض)" : "الكمبيوتر يفكر..."; return false;
+        
+        statusEl.textContent = chess.turn() === "w" ? "دورك (الأبيض)" : "الكمبيوتر يفكر..."; 
+        return false;
     }
 
     // =========================================
-    // 🤖 الذكاء الاصطناعي (3 مستويات)
+    // 🤖 الذكاء الاصطناعي
     // =========================================
     const pieceValues = { p: 100, n: 320, b: 330, r: 500, q: 900, k: 20000 };
     function evaluateBoard() { 
@@ -268,15 +284,13 @@
         let bestMove = null; 
         
         if (currentMode === 'easy') {
-            // سهل: يلعب حركة عشوائية
             bestMove = moves[Math.floor(Math.random() * moves.length)];
         } else {
-            // متوسط وصعب: يستخدم خوارزمية Minimax
             let depth = currentMode === 'hard' ? 3 : 2;
             let bestVal = -Infinity; 
             for (const move of moves) { 
                 chess.move(move); 
-                const val = minimax(depth - 1, -Infinity, Infinity, false) + Math.random(); // عشوائية بسيطة
+                const val = minimax(depth - 1, -Infinity, Infinity, false) + Math.random(); 
                 chess.undo(); 
                 if (val > bestVal) { bestVal = val; bestMove = move; } 
             }
@@ -331,7 +345,7 @@
     }
 
     // =========================================
-    // 🚀 بدء اللعبة وإدارة الأنماط
+    // 🚀 بدء اللعبة
     // =========================================
     window.startMode = (mode) => {
         currentMode = mode;
@@ -341,18 +355,16 @@
         selectedSquare = null; thinking = false; 
         $("end-screen").style.display = "none"; 
         highlightSquares(); drawBoard(); updateStatus();
-        requestAnimationFrame(() => { resize(); });
+        
+        // إصلاح مشكلة أبعاد الشاشة في الموبايل (تأخير بسيط)
+        setTimeout(() => { 
+            const w = $("game").clientWidth; const h = $("game").clientHeight;
+            if (w > 0 && h > 0) {
+                renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix();
+            }
+        }, 100);
     };
 
-    window.onlineMsg = () => alert("🌍 اللعب أونلاين يتطلب ربط اللعبة بسيرفر (Backend) مثل Firebase. هذا الخيار قيد التطوير حالياً!");
-    window.friendsMsg = () => alert("👥 تحدي الأصدقاء عبر فيسبوك يتطلب إنشاء تطبيق (Facebook App) وربطه بسيرفر. هذا الخيار قيد التطوير حالياً!");
-
-    function resize() {
+    window.addEventListener("resize", () => {
         const w = $("game").clientWidth; const h = $("game").clientHeight;
-        if (w === 0 || h === 0) return;
-        renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix();
-    }
-    window.addEventListener("resize", resize);
-
-    let time = 0;
-    renderer.setAnimationLo
+        if (w > 0 && h > 0) { renderer.setSiz
