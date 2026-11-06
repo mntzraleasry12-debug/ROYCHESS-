@@ -1,465 +1,319 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Monster Chess 3D</title>
-    
-    <!-- استدعاء مكتبات الثري دي والشطرنج -->
-    <script type="importmap">
-    {
-        "imports": {
-            "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
-            "OrbitControls": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/controls/OrbitControls.js",
-            "chess": "https://cdn.jsdelivr.net/npm/chess.js@1.4.0/dist/esm/chess.js"
-        }
-    }
-    </script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>شطرنج 3D</title>
 
-    <style>
-        /* --- إعدادات الصفحة الأساسية --- */
-        * { box-sizing: border-box; }
-        body {
-            margin: 0; padding: 0; background-color: #000; color: white;
-            font-family: Arial, sans-serif; text-align: center;
-            overflow: hidden; display: flex; justify-content: center; align-items: center;
-            height: 100vh;
-        }
-
-        /* --- 1. الواجهة الرئيسية (الصورة والأزرار) --- */
-        #menu-wrapper {
-            position: relative; display: flex; justify-content: center; align-items: center;
-            height: 100vh; width: 100vw; background-color: #000; z-index: 10;
-        }
-        #menu-image {
-            height: 100vh; width: auto; max-width: 100vw; object-fit: contain;
-        }
-        .hotspot {
-            position: absolute; cursor: pointer; border: none; outline: none;
-            background-color: rgba(255, 0, 0, 0); transition: background-color 0.2s;
-        }
-        #btn-settings { top: 2%; left: 2%; width: 15%; height: 10%; }
-        #btn-friends { bottom: 10%; left: 5%; width: 42%; height: 18%; }
-        #btn-computer { bottom: 10%; right: 5%; width: 42%; height: 18%; }
-
-        /* زر التعديل (لرؤية أماكن الأزرار) */
-        #debug-btn {
-            position: absolute; top: 10px; right: 10px; z-index: 9999;
-            background: #00ff00; color: black; border: none; padding: 5px 10px;
-            cursor: pointer; font-weight: bold; border-radius: 5px; font-size: 12px; opacity: 0.5;
-        }
-
-        /* --- 2. شاشة الإعدادات --- */
-        #settings-modal {
-            display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: #222; border: 2px solid #ffd700; border-radius: 15px; padding: 20px;
-            z-index: 3000; color: white; text-align: center; width: 250px; box-shadow: 0 10px 30px rgba(0,0,0,0.9);
-        }
-        #settings-modal h2 { margin-top: 0; color: #ffd700; }
-        .setting-row { display: flex; justify-content: space-between; margin: 15px 0; font-size: 18px; }
-        .close-btn { margin-top: 15px; padding: 10px; background: #d500f9; color: white; border: none; border-radius: 10px; width: 100%; cursor: pointer; font-weight: bold; }
-
-        /* --- 3. شاشة اللعبة 3D --- */
-        #game-container {
-            display: none; width: 100vw; height: 100vh; position: absolute; top: 0; left: 0;
-            background: #101323; flex-direction: column; z-index: 20;
-        }
-        header { padding: 10px; background: #202943; }
-        h1 { margin: 0; color: #ffd166; font-size: 20px; }
-        header div { font-size: 12px; margin-top: 5px; }
-        
-        .panel { padding: 10px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
-        .controls-row { display: flex; justify-content: center; gap: 10px; width: 100%; }
-        
-        button, select {
-            padding: 10px 15px; border: 0; border-radius: 10px; background: #ffc857;
-            color: #222; font-weight: bold; font-size: 14px; cursor: pointer; flex: 1; max-width: 150px;
-        }
-        button:active { transform: scale(0.96); }
-        
-        #game { width: 100%; flex: 1; min-height: 50vh; display: block; }
-        #status { color: #8ee7ff; font-size: 16px; margin: 5px; font-weight: bold; }
-        .info { color: #ddd; font-size: 12px; margin-bottom: 10px; }
-        
-        /* زر العودة للواجهة */
-        .back-btn {
-            position: absolute; top: 15px; right: 15px; padding: 8px 15px; background: #f44336;
-            color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: bold; z-index: 100;
-        }
-        
-        #loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 20px; color: #fff; }
-    </style>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;
+ background:radial-gradient(#08783b,#002515);
+ color:white;
+ font-family:Tahoma,Arial;
+ text-align:center;
+}
+button{
+ padding:14px;
+ border:2px solid gold;
+ border-radius:15px;
+ background:linear-gradient(#ffce00,#c35b00);
+ color:white;
+ font-weight:bold;
+ font-size:17px;
+ cursor:pointer;
+}
+#menu{
+ width:100%;
+ max-width:690px;
+ height:100vh;
+ margin:auto;
+ background:url("menu.png") center/100% 100% no-repeat;
+ position:relative;
+}
+.menu-buttons{
+ position:absolute;
+ top:60%;
+ width:100%;
+ display:flex;
+ gap:8px;
+ padding:8px;
+}
+.menu-buttons button{
+ flex:1;
+ height:130px;
+}
+#game{
+ display:none;
+ padding:15px;
+ max-width:650px;
+ margin:auto;
+}
+#board{
+ display:grid;
+ grid-template-columns:repeat(8,1fr);
+ width:95%;
+ margin:20px auto;
+ aspect-ratio:1;
+ transform:perspective(800px) rotateX(7deg);
+ border:8px solid #7a3908;
+ box-shadow:0 18px 0 #321600,0 25px 30px #000;
+}
+.square{
+ display:flex;
+ justify-content:center;
+ align-items:center;
+ aspect-ratio:1;
+ cursor:pointer;
+ position:relative;
+}
+.light{background:#e8c58b}
+.dark{background:#17623e}
+.selected{outline:4px solid yellow;outline-offset:-4px}
+.target:after{
+ content:"";
+ width:25%;
+ height:25%;
+ border-radius:50%;
+ background:#ffe900aa;
+}
+.piece{
+ font-family:"Segoe UI Symbol",serif;
+ font-size:clamp(27px,7vw,55px);
+ line-height:1;
+ filter:drop-shadow(2px 3px 2px #0008);
+}
+.white{color:white;text-shadow:1px 2px 2px #333}
+.black{color:#111;text-shadow:1px 2px 2px white}
+.controls{
+ display:flex;
+ justify-content:center;
+ flex-wrap:wrap;
+ gap:8px;
+}
+.panel{
+ background:#550025;
+ border:3px solid gold;
+ border-radius:20px;
+ padding:20px;
+ margin:20px auto;
+ max-width:350px;
+}
+.hidden{display:none}
+</style>
 </head>
+
 <body>
 
-    <!-- 1. الواجهة الرئيسية -->
-    <div id="menu-wrapper">
-        <button id="debug-btn" onclick="toggleDebug()">تعديل الأزرار</button>
-        <img id="menu-image" src="menu.png" alt="القائمة">
-        <button class="hotspot" id="btn-settings" onclick="openSettings()"></button>
-        <button class="hotspot" id="btn-friends" onclick="startGame()"></button>
-        <button class="hotspot" id="btn-computer" onclick="startGame()"></button>
-    </div>
+<div id="menu">
+ <button onclick="settings()">⚙ الإعدادات</button>
+ <div class="menu-buttons">
+  <button onclick="startGame('friend')">
+   تحدي الأصدقاء
+  </button>
+  <button onclick="startGame('computer')">
+   اللعب ضد الكمبيوتر
+  </button>
+ </div>
+</div>
 
-    <!-- 2. نافذة الإعدادات -->
-    <div id="settings-modal">
-        <h2>الإعدادات</h2>
-        <div class="setting-row">
-            <span>الموسيقى</span>
-            <input type="checkbox" id="music-toggle" checked onchange="toggleMusic()">
-        </div>
-        <div class="setting-row">
-            <span>صوت النقر</span>
-            <input type="checkbox" id="sfx-toggle" checked>
-        </div>
-        <button class="close-btn" onclick="closeSettings()">إغلاق</button>
-    </div>
+<div id="settings" class="panel hidden">
+ <h2>الإعدادات</h2>
+ <p>الموسيقى <input id="music" type="checkbox" checked></p>
+ <p>صوت النقر <input id="clickSound" type="checkbox" checked></p>
+ <button onclick="closeSettings()">حفظ</button>
+</div>
 
-    <!-- 3. شاشة اللعبة 3D -->
-    <div id="game-container">
-        <button class="back-btn" onclick="goBack()">عودة</button>
-        <header>
-            <h1>🐉 MONSTER CHESS</h1>
-            <div>شطرنج الوحوش ثلاثي الأبعاد</div>
-        </header>
+<div id="game">
+ <h1>♛ شطرنج 3D</h1>
+ <h3 id="status">دور الأبيض</h3>
 
-        <div class="panel">
-            <div class="controls-row">
-                <select id="level">
-                    <option value="easy">🟢 السهل</option>
-                    <option value="hard">🔴 الصعب</option>
-                </select>
-                <button onclick="restart()">🔄 لعبة جديدة</button>
-                <button onclick="undo()">↩ تراجع</button>
-            </div>
-        </div>
+ <div id="board"></div>
 
-        <div id="loading">جاري تحميل اللعبة...</div>
-        <div id="game"></div>
+ <div class="controls">
+  <button onclick="undo()">تراجع</button>
+  <button onclick="restart()">إعادة اللعب</button>
+  <button onclick="home()">القائمة</button>
+ </div>
+</div>
 
-        <div class="panel">
-            <div id="status">دورك الآن - الأبيض</div>
-            <div class="info">اسحب الشاشة للتدوير، والمس الوحش ثم المربع للتحريك.</div>
-        </div>
-    </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/1.4.0/chess.min.js"></script>
 
-    <!-- موسيقى الخلفية -->
-    <audio id="bg-music" loop>
-        <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=chess-think-110112.mp3" type="audio/mpeg">
-    </audio>
+<script>
+let chess;
+let selected=null;
+let mode="friend";
+let history=[];
 
-    <script>
-        // ==========================================
-        // --- أكواد القائمة والإعدادات والصوت ---
-        // ==========================================
-        const bgMusic = document.getElementById('bg-music');
-        bgMusic.volume = 0.2;
-        let audioCtx;
+const pieces={
+ wk:"♔",wq:"♕",wr:"♖",wb:"♗",wn:"♘",wp:"♙",
+ bk:"♚",bq:"♛",br:"♜",bb:"♝",bn:"♞",bp:"♟"
+};
 
-        function playClick() {
-            if (!document.getElementById('sfx-toggle').checked) return;
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const osc = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.1);
-            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-            osc.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            osc.start(); osc.stop(audioCtx.currentTime + 0.1);
-        }
+function settings(){
+ document.getElementById("settings").classList.toggle("hidden");
+}
 
-        document.body.addEventListener('click', function initAudio() {
-            if(document.getElementById('music-toggle').checked) bgMusic.play().catch(e => {});
-            if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            document.body.removeEventListener('click', initAudio);
-        }, { once: true });
+function closeSettings(){
+ document.getElementById("settings").classList.add("hidden");
+}
 
-        function toggleMusic() {
-            if(document.getElementById('music-toggle').checked) bgMusic.play();
-            else bgMusic.pause();
-        }
+function sound(){
+ if(!document.getElementById("clickSound").checked)return;
+ try{
+  let a=new AudioContext();
+  let o=a.createOscillator();
+  let g=a.createGain();
+  o.frequency.value=550;
+  g.gain.value=.04;
+  o.connect(g);
+  g.connect(a.destination);
+  o.start();
+  o.stop(a.currentTime+.06);
+ }catch(e){}
+}
 
-        function openSettings() { playClick(); document.getElementById('settings-modal').style.display = 'block'; }
-        function closeSettings() { playClick(); document.getElementById('settings-modal').style.display = 'none'; }
+function startGame(type){
+ mode=type;
+ chess=new Chess();
+ history=[];
+ selected=null;
+ document.getElementById("menu").style.display="none";
+ document.getElementById("game").style.display="block";
+ render();
+ sound();
+}
 
-        let isDebug = false;
-        function toggleDebug() {
-            isDebug = !isDebug;
-            const hotspots = document.querySelectorAll('.hotspot');
-            const colors = ['rgba(255, 0, 0, 0.5)', 'rgba(0, 255, 0, 0.5)', 'rgba(0, 0, 255, 0.5)'];
-            hotspots.forEach((btn, index) => {
-                btn.style.backgroundColor = isDebug ? colors[index] : 'rgba(255, 0, 0, 0)';
-            });
-        }
+function render(){
+ const board=document.getElementById("board");
+ board.innerHTML="";
 
-        let gameInitialized = false;
-        function startGame() {
-            playClick();
-            document.getElementById('menu-wrapper').style.display = 'none';
-            document.getElementById('game-container').style.display = 'flex';
-            
-            // تشغيل محرك 3D إذا لم يكن يعمل
-            if (!gameInitialized) {
-                init3DGame();
-                gameInitialized = true;
-            } else {
-                // تحديث حجم الشاشة عند العودة
-                window.dispatchEvent(new Event('resize'));
-            }
-        }
+ let moves=selected?
+ chess.moves({square:selected,verbose:true}):[];
 
-        function goBack() {
-            playClick();
-            document.getElementById('game-container').style.display = 'none';
-            document.getElementById('menu-wrapper').style.display = 'flex';
-        }
-    </script>
+ for(let r=7;r>=0;r--){
+  for(let f=0;f<8;f++){
+   let sq="abcdefgh"[f]+(r+1);
+   let p=chess.get(sq);
+   let cell=document.createElement("div");
 
-    <!-- ========================================== -->
-    <!-- --- محرك لعبة الوحوش 3D --- -->
-    <!-- ========================================== -->
-    <script type="module">
-        import * as THREE from "three";
-        import {OrbitControls} from "OrbitControls";
-        import {Chess} from "chess";
+   cell.className="square "+((r+f)%2?"dark":"light");
 
-        let game, holder, scene, camera, renderer, controls;
-        let selected = null, busy = false, squares = [], pieceMeshes = [];
-        const files = "abcdefgh";
-        const raycaster = new THREE.Raycaster();
-        const pointer = new THREE.Vector2();
+   if(selected===sq)cell.classList.add("selected");
 
-        window.init3DGame = function() {
-            document.getElementById("loading").style.display = "none";
-            game = new Chess();
-            holder = document.getElementById("game");
-            
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x101323);
+   if(moves.some(m=>m.to===sq))
+    cell.classList.add("target");
 
-            camera = new THREE.PerspectiveCamera(45, holder.clientWidth / holder.clientHeight, 0.1, 100);
-            camera.position.set(7, 9, 11);
+   if(p){
+    let piece=document.createElement("span");
+    piece.className="piece "+(p.color==="w"?"white":"black");
+    piece.textContent=pieces[p.color+p.type];
+    cell.appendChild(piece);
+   }
 
-            renderer = new THREE.WebGLRenderer({antialias: true});
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            renderer.setSize(holder.clientWidth, holder.clientHeight);
-            renderer.shadowMap.enabled = true;
-            holder.appendChild(renderer.domElement);
+   cell.onclick=()=>play(sq);
+   board.appendChild(cell);
+  }
+ }
 
-            controls = new OrbitControls(camera, renderer.domElement);
-            controls.enableDamping = true;
-            controls.maxPolarAngle = Math.PI / 2.05;
-            controls.minDistance = 8;
-            controls.maxDistance = 19;
+ let text=chess.isCheckmate()?"كش مات!":
+ chess.isDraw()?"تعادل":
+ chess.turn()==="w"?"دور الأبيض":"دور الأسود";
 
-            scene.add(new THREE.HemisphereLight(0xffffff, 0x333344, 2));
-            const light = new THREE.DirectionalLight(0xffffff, 3);
-            light.position.set(5, 10, 7);
-            light.castShadow = true;
-            scene.add(light);
+ if(chess.isCheck())text+=" - كش!";
+ document.getElementById("status").textContent=text;
+}
 
-            const board = new THREE.Group(); scene.add(board);
-            const pieces = new THREE.Group(); scene.add(pieces);
+function play(sq){
+ if(chess.isGameOver())return;
 
-            // بناء المربعات
-            for (let r = 0; r < 8; r++) {
-                for (let f = 0; f < 8; f++) {
-                    const mesh = new THREE.Mesh(
-                        new THREE.BoxGeometry(1, 0.25, 1),
-                        new THREE.MeshStandardMaterial({ color: (r + f) % 2 ? 0x9b684c : 0xe5c99a })
-                    );
-                    mesh.position.set(f - 3.5, -0.13, 3.5 - r);
-                    mesh.userData.square = true;
-                    board.add(mesh); squares.push(mesh);
-                }
-            }
+ if(selected){
+  let move=chess.moves({
+   square:selected,
+   verbose:true
+  }).find(m=>m.to===sq);
 
-            const base = new THREE.Mesh(
-                new THREE.BoxGeometry(8.5, 0.4, 8.5),
-                new THREE.MeshStandardMaterial({ color: 0x292d42 })
-            );
-            base.position.y = -0.4; board.add(base);
+  if(move){
+   chess.move({
+    from:selected,
+    to:sq,
+    promotion:"q"
+   });
+   selected=null;
+   render();
+   sound();
 
-            // ربط دوال اللعبة بالنافذة (Window) لتجنب مشاكل النطاق
-            window.game = game;
-            window.piecesGroup = pieces;
-            window.renderer = renderer;
-            window.camera = camera;
-            window.scene = scene;
-            window.controls = controls;
-            
-            drawPieces();
-            animate();
-            
-            renderer.domElement.addEventListener("click", click);
-            window.addEventListener('resize', onWindowResize);
-        }
+   if(mode==="computer" &&
+      !chess.isGameOver() &&
+      chess.turn()==="b"){
+    setTimeout(computerMove,400);
+   }
+   return;
+  }
+ }
 
-        function onWindowResize() {
-            if(!renderer || !holder) return;
-            camera.aspect = holder.clientWidth / holder.clientHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(holder.clientWidth, holder.clientHeight);
-        }
+ let p=chess.get(sq);
 
-        function monster(type, color) {
-            const group = new THREE.Group();
-            const bodyColor = color === "w" ? 0x37c9b0 : 0x8e55d8;
-            const material = new THREE.MeshStandardMaterial({ color: bodyColor, roughness: 0.35, metalness: 0.15 });
-            const dark = new THREE.MeshStandardMaterial({ color: 0x202030 });
-            const eye = new THREE.MeshStandardMaterial({ color: 0xffffff });
-            const black = new THREE.MeshStandardMaterial({ color: 0x111111 });
+ if(p && p.color===chess.turn()){
+  selected=sq;
+ }else{
+  selected=null;
+ }
+ render();
+ sound();
+}
 
-            function sphere(x, y, z, sx, sy, sz, mat) {
-                const m = new THREE.Mesh(new THREE.SphereGeometry(1, 20, 16), mat);
-                m.position.set(x, y, z); m.scale.set(sx, sy, sz); m.castShadow = true;
-                group.add(m); return m;
-            }
-            function horn(x, z) {
-                const h = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.4, 12), new THREE.MeshStandardMaterial({ color: 0xffd166 }));
-                h.position.set(x, 1.25, z); group.add(h);
-            }
+function computerMove(){
+ if(chess.isGameOver())return;
 
-            sphere(0, 0.48, 0, 0.35, 0.48, 0.3, material);
-            sphere(0, 0.9, 0, 0.34, 0.34, 0.32, material);
-            for (const x of [-0.14, 0.14]) {
-                sphere(x, 1, 0.27, 0.10, 0.12, 0.07, eye);
-                sphere(x, 1, 0.33, 0.045, 0.065, 0.035, black);
-            }
+ let moves=chess.moves({verbose:true});
+ if(!moves.length)return;
 
-            if (type === "k") { horn(-0.2, 0); horn(0.2, 0); sphere(0, 1.4, 0, 0.28, 0.12, 0.25, new THREE.MeshStandardMaterial({ color: 0xffc857 })); }
-            if (type === "q") { for (let i = -1; i <= 1; i++) horn(i * 0.2, 0); }
-            if (type === "r") { const crown = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.2, 0.6), dark); crown.position.y = 1.25; group.add(crown); }
-            if (type === "b") { horn(0, 0); sphere(0, 1.3, 0, 0.13, 0.18, 0.13, dark); }
-            if (type === "n") { sphere(0, 0.9, 0.35, 0.15, 0.22, 0.35, dark); horn(0.15, 0.1); }
-            if (type === "p") { sphere(0, 1.25, 0, 0.13, 0.15, 0.13, new THREE.MeshStandardMaterial({ color: 0xffd166 })); }
+ moves.sort((a,b)=>{
+  let score=m=>
+   (m.captured?3:0)+(m.san.includes("+")?2:0);
+  return score(b)-score(a);
+ });
 
-            group.userData.type = type;
-            return group;
-        }
+ let best=moves.slice(0,Math.min(5,moves.length));
+ let m=best[Math.floor(Math.random()*best.length)];
 
-        function squarePos(s) {
-            return { x: files.indexOf(s[0]) - 3.5, z: 3.5 - (Number(s[1]) - 1) };
-        }
+ chess.move({
+  from:m.from,
+  to:m.to,
+  promotion:"q"
+ });
 
-        function drawPieces() {
-            piecesGroup.clear();
-            pieceMeshes = [];
-            const boardState = game.board();
+ render();
+ sound();
+}
 
-            for (let r = 0; r < 8; r++) {
-                for (let f = 0; f < 8; f++) {
-                    const p = boardState[r][f];
-                    if (!p) continue;
-                    const s = files[f] + (8 - r);
-                    const pos = squarePos(s);
-                    const obj = monster(p.type, p.color);
-                    obj.position.set(pos.x, 0.05, pos.z);
-                    obj.userData.position = s;
-                    obj.userData.color = p.color;
-                    obj.userData.type = p.type;
-                    piecesGroup.add(obj);
-                    pieceMeshes.push(obj);
-                }
-            }
-        }
+function undo(){
+ if(!chess)return;
+ chess.undo();
 
-        function clearHighlights() {
-            squares.forEach(s => {
-                s.material.color.setHex(
-                    (Math.round(s.position.x + 3.5) + Math.round(3.5 - s.position.z)) % 2 ? 0x9b684c : 0xe5c99a
-                );
-            });
-        }
+ if(mode==="computer" && chess.turn()==="b"){
+  chess.undo();
+ }
 
-        function highlightMoves(from) {
-            clearHighlights();
-            const moves = game.moves({ square: from, verbose: true });
-            moves.forEach(m => {
-                const pos = squarePos(m.to);
-                const sqr = squares.find(s => Math.abs(s.position.x - pos.x) < 0.01 && Math.abs(s.position.z - pos.z) < 0.01);
-                if (sqr) sqr.material.color.setHex(0x54d68b);
-            });
-        }
+ selected=null;
+ render();
+ sound();
+}
 
-        function status(text) {
-            document.getElementById("status").textContent = text;
-        }
+function restart(){
+ chess.reset();
+ selected=null;
+ render();
+ sound();
+}
 
-        function finishCheck() {
-            if (game.isCheckmate()) { status("🏆 كش مات! الفائز: " + (game.turn() === "w" ? "الأسود" : "الأبيض")); return true; }
-            if (game.isDraw()) { status("🤝 تعادل!"); return true; }
-            if (game.isCheck()) { status("⚠️ كش! انتبه لملكك"); return false; }
-            status(game.turn() === "w" ? "دورك الآن - الأبيض" : "🤖 الكمبيوتر يفكر...");
-            return false;
-        }
-
-        function playerMove(from, to) {
-            const move = game.move({ from, to, promotion: "q" });
-            if (!move) return false;
-            drawPieces();
-            clearHighlights();
-            selected = null;
-            return true;
-        }
-
-        function evaluate() {
-            const values = { p: 100, n: 320, b: 330, r: 500, q: 900, k: 20000 };
-            let score = 0;
-            game.board().forEach(row => row.forEach(p => {
-                if (p) score += (p.color === "b" ? 1 : -1) * values[p.type];
-            }));
-            return score;
-        }
-
-        function minimax(depth, alpha, beta, maximizing) {
-            if (depth === 0 || game.isGameOver()) return evaluate();
-            const moves = game.moves();
-            if (maximizing) {
-                let best = -Infinity;
-                for (const m of moves) {
-                    game.move(m); best = Math.max(best, minimax(depth - 1, alpha, beta, false)); game.undo();
-                    alpha = Math.max(alpha, best); if (beta <= alpha) break;
-                }
-                return best;
-            } else {
-                let best = Infinity;
-                for (const m of moves) {
-                    game.move(m); best = Math.min(best, minimax(depth - 1, alpha, beta, true)); game.undo();
-                    beta = Math.min(beta, best); if (beta <= alpha) break;
-                }
-                return best;
-            }
-        }
-
-        window.computerMove = function() {
-            if (game.isGameOver()) return;
-            const moves = game.moves();
-            if (!moves.length) return;
-            const hard = document.getElementById("level").value === "hard";
-            let chosen;
-
-            if (!hard) {
-                const captures = moves.filter(m => m.includes("x"));
-                const pool = Math.random() < 0.45 && captures.length ? captures : moves;
-                chosen = pool[Math.floor(Math.random() * pool.length)];
-            } else {
-                let best = -Infinity;
-                for (const m of moves) {
-                    game.move(m); const score = minimax(2, -Infinity, Infinity, false); game.undo();
-                    if (score > best) { best = score; chosen = m; }
-                }
-            }
-            game.move(chosen);
-            drawPieces();
-            finishCheck();
-        }
-
-        // --- دالة النقر المكتملة ---
-        function click(event) {
-            if (busy || game.isGameOver() || game.turn() !== "w") return;
-
-            const rect = r
+function home(){
+ document.getElementById("game").style.display="none";
+ document.getElementById("menu").style.display="block";
+}
+</script>
+</body>
+</html>
