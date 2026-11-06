@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>شطرنج 3D - مع الإعدادات</title>
+    
+    <!-- استيراد الخطوط -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
+    <!-- استيراد مكتبة الأيقونات -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* =========================================
+           إعدادات عامة
+        ========================================= */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            background: radial-gradient(circle at 50% 0%, #115a2e 0%, #073519 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #ffffff;
+            padding: 20px;
+            overflow: hidden; /* لمنع التمرير أثناء فتح النوافذ */
+            font-family: 'Tajawal', sans-serif;
+        }
+
+        /* =========================================
+           تصميم واجهة تسجيل الدخول (Login)
+        ========================================= */
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: opacity 0.4s ease;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+            width: 100%;
+        }
+
+        .chess-image {
+            font-size: 50px;
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            color: #fff;
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5));
+        }
+
+        .title {
+            font-size: 42px;
+            font-weight: 800;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            margin-bottom: -5px;
+        }
+
+        .title span {
+            color: #fbc02d;
+            font-size: 48px;
+        }
+
+        .title-underline {
+            width: 120px;
+            height: 3px;
+            background: #fbc02d;
+            margin: 5px auto 0;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #fbc02d;
+        }
+
+        .login-box {
+            background: rgba(10, 66, 34, 0.7);
+            border: 1px solid #1b6e3d;
+            border-radius: 20px;
+            padding: 25px 20px;
+            width: 100%;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+        }
+
+        .tabs {
+            display: flex;
+            background: #0d4423;
+            border-radius: 30px;
+            padding: 5px;
+            margin-bottom: 25px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #a0c7b0;
+            padding: 12px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: 0.3s;
+            font-family: 'Tajawal', sans-serif;
+        }
+
+        .tab-btn.active {
+            background: #1cba52;
+            color: #ffffff;
+            box-shadow: 0 4px 10px rgba(28, 186, 82, 0.3);
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .input-group input {
+            width: 100%;
+            background: transparent;
+            border: 1px solid #1b6e3d;
+            border-radius: 12px;
+            padding: 14px 45px 14px 15px;
+            color: #ffffff;
+            font-size: 15px;
+            outline: none;
+            transition: 0.3s;
+            font-family: 'Tajawal', sans-serif;
+        }
+
+        .input-group input::placeholder {
+            color: #b0c9b8;
+        }
+
+        .input-group input:focus {
+            border-color: #1cba52;
+            box-shadow: 0 0 8px rgba(28, 186, 82, 0.4);
+        }
+
+        .input-group i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #ffffff;
+            font-size: 18px;
+        }
+
+        .options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .remember {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            color: #d1e2d6;
+        }
+
+        .remember input { display: none; }
+
+        .checkmark {
+            width: 18px;
+            height: 18px;
+            background: #ffffff;
+            border-radius: 4px;
+            display: inline-block;
+            position: relative;
+        }
+
+        .remember input:checked ~ .checkmark { background: #fbc02d; }
+
+        .remember input:checked ~ .checkmark::after {
+            content: "\f00c";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            font-size: 12px;
+            color: #000;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .forgot {
+            color: #fbc02d;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            border: none;
+            font-size: 18px;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-family: 'Tajawal', sans-serif;
+        }
+
+        .btn:active { transform: scale(0.98); }
+
+        .btn-primary {
+            background: linear-gradient(to bottom, #ffc107, #f59f00);
+            color: #1a1a1a;
+            box-shadow: 0 5px 15px rgba(245, 159, 0, 0.4);
+            margin-bottom: 20px;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(to bottom, #24c759, #17a341);
+            color: #ffffff;
+            box-shadow: 0 5px 15px rgba(23, 163, 65, 0.4);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: #7ea88f;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #1b6e3d;
+        }
+
+        .divider::before { margin-left: 15px; }
+        .divider::after { margin-right: 15px; }
+
+        .footer {
+            margin-top: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 14px;
+            color: #d1e2d6;
+            width: 100%;
+        }
+
+        .footer::before, .footer::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #1b6e3d;
+        }
+
+        .footer i { color: #fbc02d; font-size: 18px; }
+
+
+        /* =========================================
+           تصميم واجهة الأزرار (Main Menu)
+        ========================================= */
+        .menu-container {
+            width: 100%;
+            max-width: 400px;
+            display: none; /* مخفية في البداية */
+            flex-direction: column;
+            gap: 20px;
+            font-family: 'Cairo', sans-serif;
+            animation: fadeIn 0.5s ease;
+            position: relative;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* زر الإعدادات العائم */
+        .floating-settings-btn {
+            position: absolute;
+            top: -15px;
+            left: -10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid #1cba52;
+            color: #fff;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 22px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: 0.3s;
+            z-index: 10;
+        }
+        .floating-settings-btn:hover { background: #1cba52; transform: rotate(90deg); }
+
+        .pjg-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .pjg-btn {
+            border: none;
+            border-radius: 20px;
+            padding: 15px 10px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 0 rgba(0, 0, 0, 0.4);
+            transition: transform 0.1s, box-shadow 0.1s;
+            outline: none;
+        }
+
+        .pjg-btn:active {
+            transform: translateY(8px);
+            box-shadow: 0 0px 0 rgba(0, 0, 0, 0.4);
+        }
+
+        .pjg-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 45%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.4), rgba(255,255,255,0));
+            border-radius: 20px 20px 0 0;
+            pointer-events: none;
+        }
+
+        .pjg-btn-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            height: 100%;
+            min-height: 120px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .pjg-icon {
+            font-size: 45px;
+            margin-bottom: 15px;
+            filter: drop-shadow(0 4px 2px rgba(0,0,0,0.3));
+        }
+
+        .pjg-text {
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 900;
+            text-shadow: 1px 2px 3px rgba(0, 0, 0, 0.6);
+        }
+
+        .pjg-purple { background: linear-gradient(180deg, #b44aff 0%, #6c00ff 100%); border: 2px solid #d19bff; }
+        .pjg-orange { background: linear-gradient(180deg, #ffd700 0%, #ff8c00 100%); border: 2px solid #ffe680; }
+        .pjg-blue { background: linear-gradient(180deg, #00e5ff 0%, #0051ff 100%); border: 2px solid #80f2ff; }
+        .pjg-green { background: linear-gradient(180deg, #7cfc00 0%, #008000 100%); border: 2px solid #b3ff66; }
+
+        .pjg-bottom-nav {
+            background: linear-gradient(180deg, #118844 0%, #085c2b 100%);
+            border-radius: 30px;
+            border: 2px solid #22cc66;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+        }
+
+        .pjg-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+
+        .pjg-nav-item:hover { opacity: 1; }
+
+        .pjg-nav-icon { font-size: 24px; margin-bottom: 5px; }
+        .pjg-nav-text { color: #ffffff; font-size: 12px; font-weight: bold; }
+
+        /* زر تسجيل الخروج */
+        .logout-btn {
+            background: transparent;
+            color: #ff4d4d;
+            border: 1px solid #ff4d4d;
+            padding: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: 'Cairo', sans-serif;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #ff4d4d;
+            color: #fff;
+        }
+
+        /* =========================================
+           تصميم شاشات الإعدادات (Settings & Privacy)
+        ========================================= */
+        .overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 90;
+            display: none; /* مخفي افتراضياً */
+            backdrop-filter: blur(3px);
+        }
+        .overlay.active { display: block; }
+
+        .modal-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 100;
+            width: 95%;
+            max-width: 420px;
+            background: #5eb890;
+            border-radius: 20px;
+            padding: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 2px solid #4e9e77;
+            display: none; /* مخفي افتراضياً */
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-container.active { display: block; }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 10px 15px 10px;
+            color: white;
+        }
+
+        .modal-header h2 {
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .close-btn {
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 28px;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: 0.2s;
+        }
+        .close-btn:hover { opacity: 1; transform: scale(1.1); }
+
+        .content-box {
+            background: #d3f5e8;
+            border-radius: 15px;
+            padding: 15px;
+            border: 2px solid #fff;
+        }
+
+        .top-icons-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .icon-btn {
+            background: linear-gradient(180deg, #7ce0b3 0%, #53b88c 100%);
+            border: 2px solid #e0fcf0;
+            border-radius: 12px;
+            padding: 10px 5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: 0.1s;
+        }
+        .icon-btn:active { transform: translateY(2px); box-shadow: 0 2px 3px rgba(0,0,0,0.1); }
+        .icon-btn i { font-size: 22px; margin-bottom: 5px; text-shadow: 1px 1px 2px rgba(0,0,0,0.2); }
+        .icon-btn span { font-size: 11px; font-weight: 600; font-family: 'Cairo', sans-serif; }
+
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 2px dashed #b2e6d0;
+            color: #333;
+            font-weight: 600;
+            font-size: 16px;
+            font-family: 'Cairo', sans-serif;
+        }
+        .setting-row:last-child { border-bottom: none; }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 54px;
+            height: 28px;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+            border: 2px solid #fff;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        input:checked + .slider { background-color: #5cdb5c; }
+        input:checked + .slider:before { transform: translateX(26px); }
+
+        .language-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 2px dashed #b2e6d0;
+            color: #333;
+            font-weight: 600;
+            font-family: 'Cairo', sans-serif;
+        }
+        .lang-btn {
+            background: #6bcfa5;
+            color: white;
+            border: none;
+            padding: 5px 20px;
+            border-radius: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #4aa37d;
+            font-family: 'Cairo', sans-serif;
+        }
+        .lang-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #4aa37d; }
+
+        .privacy-btn-container { text-align: center; padding: 15px 0 5px 0; }
+        
+        .privacy-btn {
+            background: #a8e8cd;
+            color: #4a7c68;
+            border: none;
+            padding: 8px 30px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #85c7ab;
+            transition: 0.1s;
+            font-family: 'Cairo', sans-serif;
+        }
+        .privacy-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #85c7ab; }
+
+        .bottom-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .btn-large {
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            color: white;
+            border: 2px solid #fff;
+            cursor: pointer;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+            transition: 0.1s;
+            font-family: 'Cairo', sans-serif;
+        }
+        .btn-large:active { transform: translateY(2px); }
+        .btn-logout { background: linear-gradient(180deg, #55d4a2 0%, #35a87c 100%); box-shadow: 0 5px 0 #217d57; }
+        .btn-logout:active { box-shadow: 0 2px 0 #217d57; }
+        
+        .btn-center { background: linear-gradient(180deg, #ffe066 0%, #f5c211 100%); box-shadow: 0 5px 0 #b38b00; color: #8a6d00; text-shadow: none; }
+        .btn-center:active { box-shadow: 0 2px 0 #b38b00; }
+
+        .footer-links {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 0 5px;
+            font-family: 'Cairo', sans-serif;
+        }
+        .footer-links a {
+            color: #fff;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* قائمة الخصوصية */
+        .privacy-list .setting-row {
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+            align-items: flex-start;
+            gap: 15px;
+            border-bottom: 2px dashed #b2e6d0;
+            padding: 12px 0;
+        }
+        .privacy-text { flex: 1; }
+        .privacy-text h3 { font-size: 16px; font-weight: 700; color: #333; margin-bottom: 4px; }
+        .privacy-text p { font-size: 11px; color: #666; line-height: 1.4; font-weight: normal; }
+    </style>
+</head>
+<body>
+
+    <!-- =========================================
+         الشاشة الأولى: تسجيل الدخول
+    ========================================= -->
+    <div class="login-container" id="login-screen">
+        <div class="header">
+            <div class="chess-image">
+                <i class="fa-solid fa-chess-queen" style="color: #e0e0e0;"></i>
+                <i class="fa-solid fa-chess-king" style="color: #111; margin-right: -15px;"></i>
+            </div>
+            <h1 class="title">شطرنج <span>3D</span></h1>
+            <div class="title-underline"></div>
+        </div>
+
+        <div class="login-box">
+            <div class="tabs">
+                <button class="tab-btn active">
+                    <i class="fa-solid fa-user"></i> تسجيل الدخول
+                </button>
+                <button class="tab-btn">
+                    <i class="fa-solid fa-user-plus"></i> إنشاء حساب
+                </button>
+            </div>
+
+            <form onsubmit="event.preventDefault(); goToMenu();">
+                <div class="input-group">
+                    <input type="email" placeholder="البريد الإلكتروني" required>
+                    <i class="fa-solid fa-envelope"></i>
+                </div>
+
+                <div class="input-group">
+                    <input type="password" placeholder="كلمة المرور" required>
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+
+                <div class="options">
+                    <label class="remember">
+                        <input type="checkbox">
+                        <span class="checkmark"></span>
+                        تذكرني
+                    </label>
+                    <a href="#" class="forgot">نسيت كلمة المرور؟</a>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa-solid fa-arrow-right-to-bracket"></i> دخول الحساب
+                </button>
+
+                <div class="divider">أو</div>
+
+                <button type="button" class="btn btn-secondary" onclick="goToMenu()">
+                    <i class="fa-solid fa-gamepad"></i> دخول كضيف
+                </button>
+            </form>
+        </div>
+
+        <div class="footer">
+            استمتع بلعبة الشطرنج <i class="fa-solid fa-crown"></i>
+        </div>
+    </div>
+
+
+    <!-- =========================================
+         الشاشة الثانية: القائمة الرئيسية (الأزرار)
+    ========================================= -->
+    <div class="menu-container" id="menu-screen">
+        
+        <!-- زر فتح الإعدادات الجديد -->
+        <button class="floating-settings-btn" onclick="openSettings()">
+            <i class="fa-solid fa-gear"></i>
+        </button>
+
+        <div class="pjg-grid">
+            <button class="pjg-btn pjg-purple" onclick="alert('سيتم فتح غرفة تحدي الأصدقاء')">
+                <div class="pjg-btn-content">
+                    <span class="pjg-icon">♟️♙</span>
+                    <span class="pjg-text">تحدي الأصدقاء</span>
+                </div>
+            </button>
+
+            <button class="pjg-btn pjg-orange" onclick="alert('سيتم بدء اللعب ضد الكمبيوتر')">
+                <div class="pjg-btn-content">
+                    <span class="pjg-icon">🖥️</span>
+                    <span class="pjg-text">اللعب ضد الكمبيوتر</span>
+                </div>
+            </button>
+
+            <button class="pjg-btn pjg-blue" onclick="alert('جاري البحث عن لاعب أونلاين...')">
+                <div class="pjg-btn-content">
+                    <span class="pjg-icon">🌍</span>
+                    <span class="pjg-text">العب أونلاين</span>
+                </div>
+            </button>
+
+            <button class="pjg-btn pjg-green" onclick="alert('بدء لعبة سريعة (5 دقائق)')">
+                <div class="pjg-btn-content">
+                    <span class="pjg-icon">⏱️♞</span>
+                    <span class="pjg-text">لعبة سريعة</span>
+                </div>
+            </button>
+        </div>
+
+        <div class="pjg-bottom-nav">
+            <div class="pjg-nav-item" onclick="alert('قسم الدردشة')">
+                <span class="pjg-nav-icon">💬</span>
+                <span class="pjg-nav-text">الدردشة</span>
+            </div>
+            <div class="pjg-nav-item" onclick="alert('قسم الإحصائيات')">
+                <span class="pjg-nav-icon">📊</span>
+                <span class="pjg-nav-text">الإحصائيات</span>
+            </div>
+            <div class="pjg-nav-item" onclick="alert('قسم الإنجازات')">
+                <span class="pjg-nav-icon">🏆</span>
+                <span class="pjg-nav-text">الإنجازات</span>
+            </div>
+        </div>
+
+        <button class="logout-btn" onclick="goToLogin()">
+            <i class="fa-solid fa-arrow-left"></i> تسجيل الخروج والعودة
+        </button>
+    </div>
+
+    <!-- =========================================
+         الشاشة الثالثة: الإعدادات (المخفي)
+    ========================================= -->
+    <!-- الطبقة السوداء الشفافة -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- الإعدادات الرئيسية -->
+    <div class="modal-container" id="main-settings">
+        <div class="modal-header">
+            <button class="close-btn" onclick="closeSettings()"><i class="fa-solid fa-xmark"></i></button>
+            <h2>الإعدادات <i class="fa-solid fa-gear"></i></h2>
+        </div>
+
+        <div class="content-box">
+            <div class="top-icons-grid">
+                <button class="icon-btn"><i class="fa-solid fa-envelope"></i><span>رسائل البريد</span></button>
+                <button class="icon-btn"><i class="fa-solid fa-share-nodes"></i><span>المشاركة</span></button>
+                <button class="icon-btn"><i class="fa-brands fa-facebook-f"></i><span>الصفحة الرئيسية</span></button>
+                <button class="icon-btn"><i class="fa-solid fa-question"></i><span>المساعدة</span></button>
+            </div>
+
+            <div class="setting-row">
+                <span>الصوت</span>
+                <label class="switch">
+                    <input type="checkbox" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="setting-row">
+                <span>الموسيقى</span>
+                <label class="switch">
+                    <input type="checkbox">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="language-row">
+                <span>اللغة</span>
+                <button class="lang-btn"><i class="fa-solid fa-pen"></i> العربية</button>
+            </div>
+
+            <div class="privacy-btn-container">
+                <button class="privacy-btn" onclick="toggleSettingsModal('privacy-settings', 'main-settings')">إعدادات الخصوصية</button>
+            </div>
+        </div>
+
+        <div class="bottom-actions">
+            <button class="btn-large btn-logout" onclick="goToLogin(); closeSettings();">تسجيل الخروج</button>
+            <button class="btn-large btn-center">مركز الحساب</button>
+        </div>
+
+        <div class="footer-links">
+            <span>الإصدار 1.5.2.0</span>
+            <a href="#"><i class="fa-regular fa-file-lines"></i> شروط الخدمة</a>
+            <a href="#"><i class="fa-solid fa-shield-halved"></i> سياسة الخصوصية</a>
+        </div>
+    </div>
+
+    <!-- إعدادات الخصوصية -->
+    <div class="modal-container" id="privacy-settings">
+        <div class="modal-header">
+            <button class="close-btn" onclick="toggleSettingsModal('main-settings', 'privacy-settings')"><i class="fa-solid fa-xmark"></i></button>
+            <h2>إعدادات الخصوصية</h2>
+        </div>
+
+        <div class="content-box privacy-list">
+            <div class="setting-row">
+                <label class="switch">
+                    <input type="checkbox">
+                    <span class="slider"></span>
+                </label>
+                <div class="privacy-text">
+                    <h3>عدم الإزعاج</h3>
+                    <p>إخفاء دعوات اللعبة، ومشاركات غرفة الدردشة، وإشعارات الأصدقاء المتصلين</p>
+                </div>
+            </div>
+            <div class="setting-row">
+                <label class="switch">
+                    <input type="checkbox">
+                    <span class="slider"></span>
+                </label>
+                <div class="privacy-text">
+                    <h3>عدم المشاهدة</h3>
+                    <p>عدم السماح لأصدقائك بمشاهدة ألعابك</p>
+                </div>
+            </div>
+            <div class="setting-row">
+                <label class="switch">
+                    <input type="checkbox">
+                    <span class="slider"></span>
+                </label>
+                <div class="privacy-text">
+                    <h3>عدم التتبع</h3>
+                    <p>عدم السماح لأصدقائك بتتبعك إلى غرفة الدردشة، ولن يمكنك أيضاً تتبعهم إلى غرفة الدردشة</p>
+                </div>
+            </div>
+            <div class="setting-row">
+                <label class="switch">
+                    <input type="checkbox">
+                    <span class="slider"></span>
+                </label>
+                <div class="privacy-text">
+                    <h3>إخفاء الجنسية</h3>
+                    <p>اجعل جنسيتك مرئية لك فقط</p>
+                </div>
+            </div>
+            <div class="setting-row">
+                <label class="switch">
+                    <input type="checkbox">
+                    <span class="slider"></span>
+                </label>
+                <div class="privacy-text">
+                    <h3>إخفاء عيد الميلاد</h3>
+                    <p>لا يستطيع الآخرون رؤية عيد ميلادك ولكن لا يزال بإمكانك تلقي هدايا عيد ميلاد من يلا لودو</p>
+                </div>
+            </div>
+            <div class="setting-row">
+                <label class="switch">
+                    <input type="checkbox">
+                    <span class="slider"></span>
+                </label>
+                <div class="privacy-text">
+                    <h3>حظر طلبات الصداقة</h3>
+                    <p>لن تتلقى طلبات صداقة بعد الآن في غضون 7 أيام</p>
+                </div>
+            </div>
+            <div class="setting-row">
+                <label class="switch">
+                    <input type="checkbox">
+                    <span class="slider"></span>
+                </label>
+                <div class="privacy-text">
+                    <h3>إخفاء عدد الرد</h3>
+                    <p>لن تعرض صفحة "نردي المفضل" عدد الرد الذي تملكه بعد الآن</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================================
+         الأكواد البرمجية (JavaScript)
+    ========================================= -->
+    <script>
+        const loginScreen = document.getElementById('login-screen');
+        const menuScreen = document.getElementById('menu-screen');
+        
+        // عناصر الإعدادات
+        const overlay = document.getElementById('overlay');
+        const mainSettings = document.getElementById('main-settings');
+        const privacySettings = document.getElementById('privacy-settings');
+
+        // الانتقال للقائمة
+        function goToMenu() {
+            loginScreen.style.display = 'none';
+            menuScreen.style.display = 'flex'; 
+        }
+
+        // العودة لتسجيل الدخول
+        function goToLogin() {
+            menuScreen.style.display = 'none';
+            loginScreen.style.display = 'flex'; 
+            closeSettings(); // إغلاق الإعدادات عند تسجيل الخروج
+        }
+
+        // فتح الإعدادات
+        function openSettings() {
+            overlay.classList.add('active');
+            mainSettings.classList.add('active');
+            privacySettings.classList.remove('active');
+        }
+
+        // إغلاق الإعدادات
+        function closeSettings() {
+            overlay.classList.remove('active');
+            mainSettings.classList.remove('active');
+            privacySettings.classList.remove('active');
+        }
+
+        // التبديل بين الإعدادات الرئيسية والخصوصية
+        function toggleSettingsModal(showId, hideId) {
+            document.getElementById(hideId).classList.remove('active');
+            document.getElementById(showId).classList.add('active');
+        }
+    </script>
+</body>
+</html>
