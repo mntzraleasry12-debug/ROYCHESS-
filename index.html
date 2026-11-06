@@ -3,13 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>شطرنج 3D - مع الإعدادات</title>
-    
-    <!-- استيراد الخطوط -->
+    <title>شطرنج 3D - تسجيل الدخول والإعدادات</title>
+
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
-    <!-- استيراد مكتبة الأيقونات -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <style>
         /* =========================================
            إعدادات عامة
@@ -29,7 +27,7 @@
             min-height: 100vh;
             color: #ffffff;
             padding: 20px;
-            overflow: hidden; /* لمنع التمرير أثناء فتح النوافذ */
+            overflow: hidden;
             font-family: 'Tajawal', sans-serif;
         }
 
@@ -275,31 +273,11 @@
 
         .footer i { color: #fbc02d; font-size: 18px; }
 
-
-        /* =========================================
-           تصميم واجهة الأزرار (Main Menu)
-        ========================================= */
-        .menu-container {
-            width: 100%;
-            max-width: 400px;
-            display: none; /* مخفية في البداية */
-            flex-direction: column;
-            gap: 20px;
-            font-family: 'Cairo', sans-serif;
-            animation: fadeIn 0.5s ease;
-            position: relative;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        /* زر الإعدادات العائم */
+        /* زر الإعدادات العائم في شاشة تسجيل الدخول */
         .floating-settings-btn {
-            position: absolute;
-            top: -15px;
-            left: -10px;
+            position: fixed;
+            top: 20px;
+            left: 20px;
             background: rgba(255, 255, 255, 0.1);
             border: 2px solid #1cba52;
             color: #fff;
@@ -313,118 +291,9 @@
             cursor: pointer;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
             transition: 0.3s;
-            z-index: 10;
+            z-index: 50;
         }
         .floating-settings-btn:hover { background: #1cba52; transform: rotate(90deg); }
-
-        .pjg-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-
-        .pjg-btn {
-            border: none;
-            border-radius: 20px;
-            padding: 15px 10px;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 8px 0 rgba(0, 0, 0, 0.4);
-            transition: transform 0.1s, box-shadow 0.1s;
-            outline: none;
-        }
-
-        .pjg-btn:active {
-            transform: translateY(8px);
-            box-shadow: 0 0px 0 rgba(0, 0, 0, 0.4);
-        }
-
-        .pjg-btn::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 45%;
-            background: linear-gradient(to bottom, rgba(255,255,255,0.4), rgba(255,255,255,0));
-            border-radius: 20px 20px 0 0;
-            pointer-events: none;
-        }
-
-        .pjg-btn-content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-between;
-            height: 100%;
-            min-height: 120px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .pjg-icon {
-            font-size: 45px;
-            margin-bottom: 15px;
-            filter: drop-shadow(0 4px 2px rgba(0,0,0,0.3));
-        }
-
-        .pjg-text {
-            color: #ffffff;
-            font-size: 16px;
-            font-weight: 900;
-            text-shadow: 1px 2px 3px rgba(0, 0, 0, 0.6);
-        }
-
-        .pjg-purple { background: linear-gradient(180deg, #b44aff 0%, #6c00ff 100%); border: 2px solid #d19bff; }
-        .pjg-orange { background: linear-gradient(180deg, #ffd700 0%, #ff8c00 100%); border: 2px solid #ffe680; }
-        .pjg-blue { background: linear-gradient(180deg, #00e5ff 0%, #0051ff 100%); border: 2px solid #80f2ff; }
-        .pjg-green { background: linear-gradient(180deg, #7cfc00 0%, #008000 100%); border: 2px solid #b3ff66; }
-
-        .pjg-bottom-nav {
-            background: linear-gradient(180deg, #118844 0%, #085c2b 100%);
-            border-radius: 30px;
-            border: 2px solid #22cc66;
-            display: flex;
-            justify-content: space-around;
-            padding: 10px;
-            box-shadow: 0 5px 10px rgba(0,0,0,0.3);
-            margin-bottom: 20px;
-        }
-
-        .pjg-nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            cursor: pointer;
-            opacity: 0.8;
-            transition: opacity 0.2s;
-        }
-
-        .pjg-nav-item:hover { opacity: 1; }
-
-        .pjg-nav-icon { font-size: 24px; margin-bottom: 5px; }
-        .pjg-nav-text { color: #ffffff; font-size: 12px; font-weight: bold; }
-
-        /* زر تسجيل الخروج */
-        .logout-btn {
-            background: transparent;
-            color: #ff4d4d;
-            border: 1px solid #ff4d4d;
-            padding: 10px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-family: 'Cairo', sans-serif;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: 0.3s;
-        }
-
-        .logout-btn:hover {
-            background: #ff4d4d;
-            color: #fff;
-        }
 
         /* =========================================
            تصميم شاشات الإعدادات (Settings & Privacy)
@@ -434,7 +303,7 @@
             top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0, 0, 0, 0.7);
             z-index: 90;
-            display: none; /* مخفي افتراضياً */
+            display: none;
             backdrop-filter: blur(3px);
         }
         .overlay.active { display: block; }
@@ -452,7 +321,7 @@
             padding: 15px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             border: 2px solid #4e9e77;
-            display: none; /* مخفي افتراضياً */
+            display: none;
             max-height: 90vh;
             overflow-y: auto;
         }
@@ -591,7 +460,7 @@
         .lang-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #4aa37d; }
 
         .privacy-btn-container { text-align: center; padding: 15px 0 5px 0; }
-        
+
         .privacy-btn {
             background: #a8e8cd;
             color: #4a7c68;
@@ -627,7 +496,7 @@
         .btn-large:active { transform: translateY(2px); }
         .btn-logout { background: linear-gradient(180deg, #55d4a2 0%, #35a87c 100%); box-shadow: 0 5px 0 #217d57; }
         .btn-logout:active { box-shadow: 0 2px 0 #217d57; }
-        
+
         .btn-center { background: linear-gradient(180deg, #ffe066 0%, #f5c211 100%); box-shadow: 0 5px 0 #b38b00; color: #8a6d00; text-shadow: none; }
         .btn-center:active { box-shadow: 0 2px 0 #b38b00; }
 
@@ -666,8 +535,13 @@
 </head>
 <body>
 
+    <!-- زر الإعدادات العائم (متاح من شاشة تسجيل الدخول) -->
+    <button class="floating-settings-btn" onclick="openSettings()" title="الإعدادات">
+        <i class="fa-solid fa-gear"></i>
+    </button>
+
     <!-- =========================================
-         الشاشة الأولى: تسجيل الدخول
+         واجهة تسجيل الدخول
     ========================================= -->
     <div class="login-container" id="login-screen">
         <div class="header">
@@ -689,7 +563,7 @@
                 </button>
             </div>
 
-            <form onsubmit="event.preventDefault(); goToMenu();">
+            <form onsubmit="event.preventDefault(); openSettings();">
                 <div class="input-group">
                     <input type="email" placeholder="البريد الإلكتروني" required>
                     <i class="fa-solid fa-envelope"></i>
@@ -715,7 +589,7 @@
 
                 <div class="divider">أو</div>
 
-                <button type="button" class="btn btn-secondary" onclick="goToMenu()">
+                <button type="button" class="btn btn-secondary" onclick="openSettings()">
                     <i class="fa-solid fa-gamepad"></i> دخول كضيف
                 </button>
             </form>
@@ -726,74 +600,14 @@
         </div>
     </div>
 
+    <!-- =========================================
+         الطبقة السوداء الشفافة
+    ========================================= -->
+    <div class="overlay" id="overlay" onclick="closeSettings()"></div>
 
     <!-- =========================================
-         الشاشة الثانية: القائمة الرئيسية (الأزرار)
+         الإعدادات الرئيسية
     ========================================= -->
-    <div class="menu-container" id="menu-screen">
-        
-        <!-- زر فتح الإعدادات الجديد -->
-        <button class="floating-settings-btn" onclick="openSettings()">
-            <i class="fa-solid fa-gear"></i>
-        </button>
-
-        <div class="pjg-grid">
-            <button class="pjg-btn pjg-purple" onclick="alert('سيتم فتح غرفة تحدي الأصدقاء')">
-                <div class="pjg-btn-content">
-                    <span class="pjg-icon">♟️♙</span>
-                    <span class="pjg-text">تحدي الأصدقاء</span>
-                </div>
-            </button>
-
-            <button class="pjg-btn pjg-orange" onclick="alert('سيتم بدء اللعب ضد الكمبيوتر')">
-                <div class="pjg-btn-content">
-                    <span class="pjg-icon">🖥️</span>
-                    <span class="pjg-text">اللعب ضد الكمبيوتر</span>
-                </div>
-            </button>
-
-            <button class="pjg-btn pjg-blue" onclick="alert('جاري البحث عن لاعب أونلاين...')">
-                <div class="pjg-btn-content">
-                    <span class="pjg-icon">🌍</span>
-                    <span class="pjg-text">العب أونلاين</span>
-                </div>
-            </button>
-
-            <button class="pjg-btn pjg-green" onclick="alert('بدء لعبة سريعة (5 دقائق)')">
-                <div class="pjg-btn-content">
-                    <span class="pjg-icon">⏱️♞</span>
-                    <span class="pjg-text">لعبة سريعة</span>
-                </div>
-            </button>
-        </div>
-
-        <div class="pjg-bottom-nav">
-            <div class="pjg-nav-item" onclick="alert('قسم الدردشة')">
-                <span class="pjg-nav-icon">💬</span>
-                <span class="pjg-nav-text">الدردشة</span>
-            </div>
-            <div class="pjg-nav-item" onclick="alert('قسم الإحصائيات')">
-                <span class="pjg-nav-icon">📊</span>
-                <span class="pjg-nav-text">الإحصائيات</span>
-            </div>
-            <div class="pjg-nav-item" onclick="alert('قسم الإنجازات')">
-                <span class="pjg-nav-icon">🏆</span>
-                <span class="pjg-nav-text">الإنجازات</span>
-            </div>
-        </div>
-
-        <button class="logout-btn" onclick="goToLogin()">
-            <i class="fa-solid fa-arrow-left"></i> تسجيل الخروج والعودة
-        </button>
-    </div>
-
-    <!-- =========================================
-         الشاشة الثالثة: الإعدادات (المخفي)
-    ========================================= -->
-    <!-- الطبقة السوداء الشفافة -->
-    <div class="overlay" id="overlay"></div>
-
-    <!-- الإعدادات الرئيسية -->
     <div class="modal-container" id="main-settings">
         <div class="modal-header">
             <button class="close-btn" onclick="closeSettings()"><i class="fa-solid fa-xmark"></i></button>
@@ -824,152 +638,4 @@
             </div>
 
             <div class="language-row">
-                <span>اللغة</span>
-                <button class="lang-btn"><i class="fa-solid fa-pen"></i> العربية</button>
-            </div>
-
-            <div class="privacy-btn-container">
-                <button class="privacy-btn" onclick="toggleSettingsModal('privacy-settings', 'main-settings')">إعدادات الخصوصية</button>
-            </div>
-        </div>
-
-        <div class="bottom-actions">
-            <button class="btn-large btn-logout" onclick="goToLogin(); closeSettings();">تسجيل الخروج</button>
-            <button class="btn-large btn-center">مركز الحساب</button>
-        </div>
-
-        <div class="footer-links">
-            <span>الإصدار 1.5.2.0</span>
-            <a href="#"><i class="fa-regular fa-file-lines"></i> شروط الخدمة</a>
-            <a href="#"><i class="fa-solid fa-shield-halved"></i> سياسة الخصوصية</a>
-        </div>
-    </div>
-
-    <!-- إعدادات الخصوصية -->
-    <div class="modal-container" id="privacy-settings">
-        <div class="modal-header">
-            <button class="close-btn" onclick="toggleSettingsModal('main-settings', 'privacy-settings')"><i class="fa-solid fa-xmark"></i></button>
-            <h2>إعدادات الخصوصية</h2>
-        </div>
-
-        <div class="content-box privacy-list">
-            <div class="setting-row">
-                <label class="switch">
-                    <input type="checkbox">
-                    <span class="slider"></span>
-                </label>
-                <div class="privacy-text">
-                    <h3>عدم الإزعاج</h3>
-                    <p>إخفاء دعوات اللعبة، ومشاركات غرفة الدردشة، وإشعارات الأصدقاء المتصلين</p>
-                </div>
-            </div>
-            <div class="setting-row">
-                <label class="switch">
-                    <input type="checkbox">
-                    <span class="slider"></span>
-                </label>
-                <div class="privacy-text">
-                    <h3>عدم المشاهدة</h3>
-                    <p>عدم السماح لأصدقائك بمشاهدة ألعابك</p>
-                </div>
-            </div>
-            <div class="setting-row">
-                <label class="switch">
-                    <input type="checkbox">
-                    <span class="slider"></span>
-                </label>
-                <div class="privacy-text">
-                    <h3>عدم التتبع</h3>
-                    <p>عدم السماح لأصدقائك بتتبعك إلى غرفة الدردشة، ولن يمكنك أيضاً تتبعهم إلى غرفة الدردشة</p>
-                </div>
-            </div>
-            <div class="setting-row">
-                <label class="switch">
-                    <input type="checkbox">
-                    <span class="slider"></span>
-                </label>
-                <div class="privacy-text">
-                    <h3>إخفاء الجنسية</h3>
-                    <p>اجعل جنسيتك مرئية لك فقط</p>
-                </div>
-            </div>
-            <div class="setting-row">
-                <label class="switch">
-                    <input type="checkbox">
-                    <span class="slider"></span>
-                </label>
-                <div class="privacy-text">
-                    <h3>إخفاء عيد الميلاد</h3>
-                    <p>لا يستطيع الآخرون رؤية عيد ميلادك ولكن لا يزال بإمكانك تلقي هدايا عيد ميلاد من يلا لودو</p>
-                </div>
-            </div>
-            <div class="setting-row">
-                <label class="switch">
-                    <input type="checkbox">
-                    <span class="slider"></span>
-                </label>
-                <div class="privacy-text">
-                    <h3>حظر طلبات الصداقة</h3>
-                    <p>لن تتلقى طلبات صداقة بعد الآن في غضون 7 أيام</p>
-                </div>
-            </div>
-            <div class="setting-row">
-                <label class="switch">
-                    <input type="checkbox">
-                    <span class="slider"></span>
-                </label>
-                <div class="privacy-text">
-                    <h3>إخفاء عدد الرد</h3>
-                    <p>لن تعرض صفحة "نردي المفضل" عدد الرد الذي تملكه بعد الآن</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- =========================================
-         الأكواد البرمجية (JavaScript)
-    ========================================= -->
-    <script>
-        const loginScreen = document.getElementById('login-screen');
-        const menuScreen = document.getElementById('menu-screen');
-        
-        // عناصر الإعدادات
-        const overlay = document.getElementById('overlay');
-        const mainSettings = document.getElementById('main-settings');
-        const privacySettings = document.getElementById('privacy-settings');
-
-        // الانتقال للقائمة
-        function goToMenu() {
-            loginScreen.style.display = 'none';
-            menuScreen.style.display = 'flex'; 
-        }
-
-        // العودة لتسجيل الدخول
-        function goToLogin() {
-            menuScreen.style.display = 'none';
-            loginScreen.style.display = 'flex'; 
-            closeSettings(); // إغلاق الإعدادات عند تسجيل الخروج
-        }
-
-        // فتح الإعدادات
-        function openSettings() {
-            overlay.classList.add('active');
-            mainSettings.classList.add('active');
-            privacySettings.classList.remove('active');
-        }
-
-        // إغلاق الإعدادات
-        function closeSettings() {
-            overlay.classList.remove('active');
-            mainSettings.classList.remove('active');
-            privacySettings.classList.remove('active');
-        }
-
-        // التبديل بين الإعدادات الرئيسية والخصوصية
-        function toggleSettingsModal(showId, hideId) {
-            document.getElementById(hideId).classList.remove('active');
-            document.getElementById(showId).classList.add('active');
-        }
-    </script>
-</body>
-</html>
+              
