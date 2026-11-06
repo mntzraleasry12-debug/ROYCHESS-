@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>شطرنج 3D - تسجيل الدخول</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Cairo & Tajawal -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@500;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        * {
+            font-family: 'Cairo', 'Tajawal', sans-serif;
+            user-select: none;
+        }
+
+        /* Full Background Canvas Style */
+        body {
+            background: radial-gradient(circle at center, #0a5c36 0%, #042d1a 50%, #01140b 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 1rem;
+        }
+
+        /* Canvas background overlay */
+        #bgCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* 3D Golden Gold Text Effect */
+        .gold-text {
+            background: linear-gradient(180deg, #FFF6B7 0%, #FBB03B 30%, #D47A00 70%, #683000 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0px 4px 10px rgba(0, 0, 0, 0.6);
+            filter: drop-shadow(0px 2px 4px rgba(255, 215, 0, 0.4));
+        }
+
+        /* 3D Shiny Metallic Gold Border & Button Styling */
+        .btn-gold {
+            background: linear-gradient(180deg, #ffe67d 0%, #fbb03b 40%, #c47600 85%, #7a4600 100%);
+            box-shadow: 0 6px 0 #4a2800, 0 10px 15px rgba(0, 0, 0, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.8);
+            border: 2px solid #fff2a1;
+            transition: all 0.15s ease-in-out;
+        }
+
+        .btn-gold:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+            box-shadow: 0 8px 0 #4a2800, 0 14px 20px rgba(255, 215, 0, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.9);
+        }
+
+        .btn-gold:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #4a2800, 0 4px 6px rgba(0, 0, 0, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.6);
+        }
+
+        /* 3D Facebook Button */
+        .btn-facebook {
+            background: linear-gradient(180deg, #4c8cff 0%, #1877f2 50%, #0d52b5 100%);
+            box-shadow: 0 5px 0 #072a63, 0 8px 12px rgba(0, 0, 0, 0.5), inset 0 2px 3px rgba(255, 255, 255, 0.6);
+            border: 1.5px solid #8bb7ff;
+        }
+        .btn-facebook:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+        .btn-facebook:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #072a63;
+        }
+
+        /* 3D Guest / Green Button */
+        .btn-emerald {
+            background: linear-gradient(180deg, #34d399 0%, #059669 50%, #046c4b 100%);
+            box-shadow: 0 5px 0 #023827, 0 8px 12px rgba(0, 0, 0, 0.5), inset 0 2px 3px rgba(255, 255, 255, 0.6);
+            border: 1.5px solid #a7f3d0;
+        }
+        .btn-emerald:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+        .btn-emerald:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #023827;
+        }
+
+        /* Glassmorphism Card Frame */
+        .game-card {
+            background: rgba(4, 38, 22, 0.75);
+            backdrop-filter: blur(16px);
+            border: 3px solid transparent;
+            border-image: linear-gradient(180deg, #fbb03b, #059669, #022c1b) 1;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), inset 0 0 15px rgba(16, 185, 129, 0.2);
+            position: relative;
+        }
+
+        /* Custom Input Field Styling */
+        .input-game {
+            background: rgba(1, 20, 11, 0.85);
+            border: 2px solid #0d6e42;
+            color: #ecfdf5;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.7);
+        }
+
+        .input-game:focus {
+            border-color: #fbb03b;
+            box-shadow: 0 0 12px rgba(251, 176, 59, 0.5), inset 0 2px 4px rgba(0, 0, 0, 0.7);
+            outline: none;
+        }
+
+        /* Floating Chess Emblem Animation */
+        @keyframes floatEmblem {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(1deg); }
+        }
+
+        .animate-float {
+            animation: floatEmblem 4s ease-in-out infinite;
+        }
+
+        /* Shimmer effect for titles */
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        
+        .shimmer-text {
+            background: linear-gradient(90deg, #ffe67d 0%, #fff 50%, #fbb03b 100%);
+            background-size: 200% auto;
+            color: #000;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 3s infinite linear;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #fbb03b;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="relative min-h-screen w-full flex items-center justify-center p-4">
+
+    <!-- Particle Background Canvas -->
+    <canvas id="bgCanvas"></canvas>
+
+    <!-- Main Container -->
+    <div class="relative z-10 w-full max-w-md mx-auto my-auto">
+        
+        <!-- Header Emblem & Logo Section -->
+        <div class="text-center mb-4 animate-float">
+            <!-- Crown & Laurel Emblem -->
+            <div class="relative inline-block">
+                <!-- Outer Golden Gloss Glow -->
+                <div class="absolute -inset-2 bg-gradient-to-r from-amber-500 to-green-500 rounded-full blur-lg opacity-40"></div>
+                
+                <div class="relative w-28 h-28 mx-auto flex items-center justify-center rounded-full bg-gradient-to-b from-amber-400 via-amber-600 to-yellow-900 p-1 border-4 border-yellow-200 shadow-2xl">
+                    <div class="w-full h-full bg-gradient-to-b from-emerald-800 to-emerald-950 rounded-full flex flex-col items-center justify-center border-2 border-amber-300 relative overflow-hidden">
+                        
+                        <!-- Chess Pieces Silhouette Background -->
+                        <div class="absolute inset-0 opacity-20 flex justify-between items-center px-2">
+                            <i class="fa-solid fa-chess-knight text-3xl text-amber-300"></i>
+                            <i class="fa-solid fa-chess-rook text-3xl text-amber-300"></i>
+                        </div>
+
+                        <!-- Main Crown Icon -->
+                        <i class="fa-solid fa-crown text-5xl gold-text transform -translate-y-1"></i>
+                        <span class="text-xs font-black tracking-widest text-amber-300 uppercase -mt-1">3D CHESS</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game Title -->
+            <h1 class="text-4xl font-extrabold gold-text tracking-wide mt-2">شطرنج 3D</h1>
+            <p class="text-emerald-200 text-sm font-semibold mt-1 opacity-90 drop-shadow">
+                سجل دخولك وابدأ التحدي والمراهنة!
+            </p>
+        </div>
+
+        <!-- Glassmorphic Login Card -->
+        <div class="game-card rounded-3xl p-6 sm:p-8 backdrop-blur-xl">
+            
+            <!-- Language Selector Header (Top Right Inside Card) -->
+            <div class="flex justify-between items-center mb-6 pb-3 border-b border-emerald-800/60">
+                <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+                    <span class="text-xs text-emerald-300 font-bold">خادم اللعبة: متصل</span>
+                </div>
+                
+                <div class="relative">
+                    <select id="langSelect" class="bg-emerald-950/80 text-amber-300 text-xs font-bold py-1 px-3 rounded-full border border-amber-500/50 outline-none cursor-pointer hover:border-amber-400 transition">
+                        <option value="ar">العربية 🇸🇦</option>
+                        <option value="en">English 🇺🇸</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Social Quick Login Options -->
+            <div class="space-y-3 mb-6">
+                <!-- Facebook Login -->
+                <button onclick="handleLogin('Facebook')" class="btn-facebook w-full py-3 px-4 rounded-2xl text-white font-bold text-sm flex items-center justify-center gap-3 transition">
+                    <i class="fa-brands fa-facebook-f text-lg bg-white/20 w-7 h-7 rounded-full flex items-center justify-center"></i>
+                    <span>تسجيل الدخول عبر فيسبوك</span>
+                </button>
+
+                <!-- Google Login -->
+                <button onclick="handleLogin('Google')" class="w-full py-3 px-4 rounded-2xl bg-gradient-to-b from-gray-100 to-gray-300 text-gray-800 font-bold text-sm flex items-center justify-center gap-3 border-2 border-white shadow-lg hover:brightness-105 active:translate-y-1 transition">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24">
+                        <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.7 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.2 9 5 12 5z"/>
+                        <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z"/>
+                        <path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.8s.2-2.1.4-2.8L1.9 6.3C.7 8.7 0 10.3 0 12s.7 3.3 1.9 5.7l3.7-2.9z"/>
+                        <path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.2-6.4-5.2L1.9 16C3.7 19.7 7.5 23 12 23z"/>
+                    </svg>
+                    <span>تسجيل الدخول عبر جوجل</span>
+                </button>
+
+                <!-- Guest Login Button -->
+                <button onclick="handleLogin('Guest')" class="btn-emerald w-full py-3 px-4 rounded-2xl text-white font-bold text-sm flex items-center justify-center gap-3 transition">
+                    <i class="fa-solid fa-user-ninja text-lg"></i>
+                    <span>الدخول كزائر / لعب سريع</span>
+                </button>
+            </div>
+
+            <!-- Divider -->
+            <div class="relative my-6 text-center">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-emerald-700/60"></div>
+                </div>
+                <span class="relative bg-emerald-950 px-4 py-1 rounded-full text-xs font-bold text-amber-400 border border-emerald-700">
+                    أو بحساب اللعبة
+                </span>
+            </div>
+
+            <!-- Credentials Form -->
+            <form id="loginForm" onsubmit="event.preventDefault(); handleStandardLogin();" class="space-y-4">
+                
+                <!-- Username / Phone Field -->
+                <div>
+                    <label class="block text-emerald-200 text-xs font-bold mb-1 mr-1">اسم المستخدم / رقم الهاتف</label>
+                    <div class="relative">
+                        <input type="text" id="username" required placeholder="أدخل اسمك أو رقم الهاتف" 
+                               class="input-game w-full py-3 pr-10 pl-4 rounded-xl text-sm font-semibold placeholder-emerald-600">
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-emerald-400">
+                            <i class="fa-solid fa-chess-pawn text-lg"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Password Field -->
+                <div>
+                    <label class="block text-emerald-200 text-xs font-bold mb-1 mr-1">كلمة المرور</label>
+                    <div class="relative">
+                        <input type="password" id="password" required placeholder="••••••••" 
+                               class="input-game w-full py-3 pr-10 pl-10 rounded-xl text-sm font-semibold placeholder-emerald-600">
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-emerald-400">
+                            <i class="fa-solid fa-lock text-base"></i>
+                        </div>
+                        <button type="button" onclick="togglePasswordVisibility()" class="absolute inset-y-0 left-0 pl-3 flex items-center text-emerald-400 hover:text-amber-400">
+                            <i id="eyeIcon" class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Remember Me & Forgot Password -->
+                <div class="flex items-center justify-between text-xs font-semibold pt-1">
+                    <label class="flex items-center text-emerald-300 cursor-pointer">
+                        <input type="checkbox" class="rounded bg-emerald-950 border-emerald-600 text-amber-500 focus:ring-0 w-4 h-4 ml-2 accent-amber-500">
+                        تذكرني
+                    </label>
+                    <a href="#" onclick="showToast('سيتم إرسال رمز العادة إلى بريدك')" class="text-amber-400 hover:underline">نسيت كلمة المرور؟</a>
+                </div>
+
+                <!-- Main Login Submit Button -->
+                <button type="submit" class="btn-gold w-full py-3.5 mt-2 rounded-2xl text-yellow-950 font-black text-lg tracking-wide flex items-center justify-center gap-2 transition">
+                    <i class="fa-solid fa-trophy text-amber-900"></i>
+                    <span>تسجيل الدخول</span>
+                </button>
+            </form>
+
+            <!-- Register New Account Link -->
+            <div class="mt-5 text-center text-xs font-semibold text-emerald-300">
+                ليس لديك حساب؟ 
+                <a href="#" onclick="showToast('تم فتح نافذة إنشاء حساب جديد')" class="text-amber-400 font-bold hover:underline mr-1">إنشاء حساب جديد</a>
+            </div>
+        </div>
+
+        <!-- Footer Info -->
+        <div class="mt-6 text-center text-emerald-400/70 text-xs space-y-2">
+            <div class="flex justify-center gap-4">
+                <a href="#" class="hover:text-amber-400 transition">الشروط والأحكام</a>
+                <span>•</span>
+                <a href="#" class="hover:text-amber-400 transition">سياسة الخصوصية</a>
+                <span>•</span>
+                <a href="#" class="hover:text-amber-400 transition">الدعم الفني</a>
+            </div>
+            <p class="font-mono text-[11px] opacity-75">إصدار اللعبة v1.0.4 © 2026 3D Chess Studio</p>
+        </div>
+
+    </div>
+
+    <!-- Notification Toast Element -->
+    <div id="toast" class="fixed bottom-5 transform translate-y-20 opacity-0 bg-gradient-to-r from-amber-500 to-yellow-600 text-amber-950 font-black px-6 py-3 rounded-2xl shadow-2xl border-2 border-yellow-200 transition-all duration-300 z-50 flex items-center gap-3">
+        <i class="fa-solid fa-circle-check text-xl"></i>
+        <span id="toastMsg">تم تسجيل الدخول بنجاح!</span>
+    </div>
+
+    <!-- Particle Background Script -->
+    <script>
+        // Interactive Canvas Particle Stars and Floating Chess Symbols
+        const canvas = document.getElementById('bgCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let particles = [];
+        const symbols = ['♟', '♞', '♝', '♜', '♛', '♚'];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 16 + 8;
+                this.speedY = -(Math.random() * 0.5 + 0.2);
+                this.speedX = (Math.random() - 0.5) * 0.3;
+                this.opacity = Math.random() * 0.4 + 0.1;
+                this.symbol = symbols[Math.floor(Math.random() * symbols.length)];
+                this.color = Math.random() > 0.5 ? '#fbb03b' : '#10b981';
+            }
+
+            update() {
+                this.y += this.speedY;
+                this.x += this.speedX;
+
+                if (this.y < -20 || this.x < -20 || this.x > canvas.width + 20) {
+                    this.reset();
+                    this.y = canvas.height + 20;
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = this.color;
+                ctx.font = `${this.size}px Cairo, sans-serif`;
+                ctx.fillText(this.symbol, this.x, this.y);
+                ctx.restore();
+            }
+        }
+
+        for (let i = 0; i < 35; i++) {
+            particles.push(new Particle());
+        }
+
+        function animateBg() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateBg);
+        }
+        animateBg();
+
+        // UI Interactions
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('password');
+            const eyeIcon = document.getElementById('eyeIcon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.classList.remove('fa-eye');
+                eyeIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.classList.remove('fa-eye-slash');
+                eyeIcon.classList.add('fa-eye');
+            }
+        }
+
+        function handleLogin(provider) {
+            showToast(`جاري الاتصال عبر ${provider}...`);
+        }
+
+        function handleStandardLogin() {
+            const user = document.getElementById('username').value;
+            if(user) {
+                showToast(`أهلاً بك مجدداً يا بطل: ${user}`);
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+            toastMsg.innerText = message;
+            
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
