@@ -2,448 +2,308 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>Monster Chess 3D - Royal Edition</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>شطرنج الوحوش</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; user-select: none; -webkit-tap-highlight-color: transparent; }
-    body { background: #050508; color: white; overflow: hidden; width: 100vw; height: 100vh; }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; user-select: none; -webkit-tap-highlight-color: transparent; }
+    body { background-color: #000; color: white; overflow: hidden; width: 100vw; height: 100vh; }
 
-    /* الواجهة الرئيسية */
-    #main-menu {
-        position: absolute; inset: 0; z-index: 100;
-        background-image: url('menu.png'); 
-        background-size: 100% 100%;
+    /* =========================================
+       الحاوية الرئيسية (خلفية صورتك)
+       ========================================= */
+    #ui-container {
+        position: absolute; inset: 0;
+        /* ✅ تم تعديل الاسم هنا ليطابق صورتك في GitHub */
+        background-image: url('board.png.jpg'); 
+        background-size: 100% 100%; /* تمدد الصورة لتملأ الشاشة */
         background-position: center;
         background-repeat: no-repeat;
-        background-color: #000;
+        z-index: 10;
     }
-    .hotspot { position: absolute; background: transparent; border: none; cursor: pointer; border-radius: 15px; z-index: 10; transition: background 0.1s; }
+
+    /* =========================================
+       شبكة الشطرنج الشفافة فوق المربعات
+       ========================================= */
+    #board {
+        position: absolute;
+        /* تم ضبط هذه الأرقام بدقة لتناسب صورة الرقعة */
+        top: 27.2%; 
+        left: 2%;
+        width: 96%; 
+        aspect-ratio: 1 / 1; 
+        display: grid;
+        grid-template-columns: repeat(8, 1fr);
+        grid-template-rows: repeat(8, 1fr);
+    }
+
+    .square {
+        display: flex; justify-content: center; align-items: center;
+        cursor: pointer; position: relative;
+    }
+
+    /* تأثيرات اختيار القطع */
+    .selected { background-color: rgba(255, 215, 0, 0.5) !important; box-shadow: inset 0 0 15px #ffd700; }
+    .valid-move::after {
+        content: ''; position: absolute; width: 30%; height: 30%;
+        background-color: rgba(0, 255, 0, 0.6); border-radius: 50%; box-shadow: 0 0 10px #0f0;
+    }
+    .valid-capture::after {
+        content: ''; position: absolute; width: 85%; height: 85%;
+        border: 4px solid rgba(255, 0, 0, 0.8); border-radius: 50%; box-shadow: 0 0 15px #f00;
+    }
+
+    /* تصميم البيادق */
+    .piece {
+        font-size: 9vw; 
+        max-font-size: 55px;
+        z-index: 5;
+        line-height: 1;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+    }
+    .piece-w { color: #ffffff; text-shadow: 0 0 8px #000, 0 0 15px #ffd700; }
+    .piece-b { color: #111111; text-shadow: 0 0 8px #fff, 0 0 15px #555; }
+
+    /* =========================================
+       الأزرار الشفافة المضبوطة فوق صورتك
+       ========================================= */
+    .hotspot { position: absolute; background: transparent; cursor: pointer; z-index: 20; border-radius: 50%; }
     .hotspot:active { background: rgba(255, 255, 255, 0.2); }
-    .btn-start { top: 48.5%; right: 3%; width: 45%; height: 12%; } 
-    
-    /* شاشة اللعبة */
-    #game-container {
-        position: absolute; inset: 0; display: none; flex-direction: column; z-index: 50;
-        background: #050508;
-    }
-    #top-bar { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: rgba(0,0,0,0.6); z-index: 10; border-bottom: 1px solid #d4af37; }
-    #status { color: #ffd700; font-size: 16px; font-weight: bold; text-shadow: 0 0 10px #ffd700; }
-    .btn-back { background: #8b0000; color: #fff; border: 1px solid #ffd700; padding: 8px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-    
-    #game { flex: 1; width: 100%; position: relative; touch-action: none; }
-    
-    /* شريط الإعدادات السفلي */
-    .panel { padding: 10px; background: rgba(0,0,0,0.8); text-align: center; border-top: 1px solid #d4af37; display: flex; flex-direction: column; gap: 8px;}
-    
-    .row { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
-    
-    select, button {
-        padding: 10px 15px; border: 1px solid #d4af37; border-radius: 8px;
-        background: linear-gradient(to bottom, #ffd700, #b8860b); color: #000; font-weight: bold;
-        font-size: 14px; cursor: pointer;
-    }
-    button:active { transform: scale(0.95); }
-    
-    /* أزرار الكاميرا */
-    .cam-btn { background: linear-gradient(to bottom, #4a4a4a, #222); color: #ffd700; border-color: #ffd700; }
+
+    /* الشريط العلوي */
+    .btn-settings { top: 1.5%; left: 1%; width: 12%; height: 6%; border-radius: 10px; }
+    .btn-profile { top: 1.5%; right: 4%; width: 14%; height: 7%; border-radius: 50%; }
+
+    /* الأزرار السفلية */
+    .btn-hint { bottom: 2%; left: 4%; width: 20%; height: 11%; }
+    .btn-undo { bottom: 2%; left: 27%; width: 20%; height: 11%; }
+    .btn-pieces { bottom: 2%; left: 50%; width: 20%; height: 11%; }
+    .btn-restart { bottom: 2%; left: 73%; width: 22%; height: 11%; }
+
+    /* شاشة الفوز */
+    #win-screen { display: none; position: absolute; inset: 0; background: rgba(0,0,0,0.85); z-index: 100; flex-direction: column; justify-content: center; align-items: center; }
+    #win-screen h1 { color: #ffd700; font-size: 40px; margin-bottom: 20px; text-shadow: 0 0 20px #d4af37; }
+    .btn-win { background: #8b0000; color: white; border: 2px solid #ffd700; padding: 15px 40px; font-size: 20px; border-radius: 10px; cursor: pointer; margin-top: 20px;}
 </style>
 </head>
 <body>
 
-    <!-- الواجهة الرئيسية -->
-    <div id="main-menu">
-        <div class="hotspot btn-start" onclick="startGame()"></div>
+    <!-- الحاوية الرئيسية -->
+    <div id="ui-container">
+        <!-- شبكة اللعب (القطع) -->
+        <div id="board"></div>
+
+        <!-- الأزرار الشفافة -->
+        <div class="hotspot btn-settings" onclick="alert('الإعدادات قريباً')"></div>
+        <div class="hotspot btn-profile" onclick="alert('الملف الشخصي')"></div>
+        
+        <div class="hotspot btn-hint" onclick="showHint()"></div>
+        <div class="hotspot btn-undo" onclick="undoMove()"></div>
+        <div class="hotspot btn-pieces" onclick="alert('تغيير القطع قريباً')"></div>
+        <div class="hotspot btn-restart" onclick="restartGame()"></div>
     </div>
 
-    <!-- شاشة اللعبة -->
-    <div id="game-container">
-        <div id="top-bar">
-            <div id="status">دورك الآن - الأبيض</div>
-            <button class="btn-back" onclick="exitGame()">خروج 🚪</button>
-        </div>
-        
-        <div id="game"></div>
-        
-        <!-- شريط الإعدادات وأزرار الكاميرا -->
-        <div class="panel">
-            <div class="row">
-                <select id="level">
-                    <option value="easy">🟢 سهل</option>
-                    <option value="hard">🔴 صعب</option>
-                </select>
-                <button onclick="restart()">🔄 لعبة جديدة</button>
-                <button onclick="undo()">↩ تراجع</button>
-            </div>
-            <div class="row">
-                <span style="color:#d4af37; font-size:12px; align-self:center; font-weight:bold;">زاوية الكاميرا:</span>
-                <button class="cam-btn" onclick="setCameraView('default')">📐 افتراضية</button>
-                <button class="cam-btn" onclick="setCameraView('top')">🔼 علوية</button>
-                <button class="cam-btn" onclick="setCameraView('side')">◀️ جانبية</button>
-            </div>
-        </div>
+    <!-- شاشة الفوز -->
+    <div id="win-screen">
+        <h1 id="win-title">🏆 فوز!</h1>
+        <button class="btn-win" onclick="restartGame()">العب مرة أخرى</button>
     </div>
 
-    <script type="importmap">
-    {
-     "imports":{
-      "three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
-      "OrbitControls":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/controls/OrbitControls.js",
-      "chess":"https://cdn.jsdelivr.net/npm/chess.js@1.4.0/dist/esm/chess.js"
-     }
-    }
-    </script>
+    <!-- مكتبة قوانين الشطرنج -->
+    <script src="https://cdn.jsdelivr.net/npm/chess.js@0.10.3/chess.min.js"></script>
 
-    <script type="module">
-    import * as THREE from "three";
-    import {OrbitControls} from "OrbitControls";
-    import {Chess} from "chess";
+    <script>
+        const game = new Chess();
+        let selectedSquare = null;
+        let isThinking = false;
+        let hintSquare = null;
 
-    const game = new Chess();
-    const holder = document.getElementById("game");
-    
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x050508); 
-    scene.fog = new THREE.Fog(0x050508, 15, 35);
-
-    const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100);
-    camera.position.set(0, 11, 11); 
-
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    holder.appendChild(renderer.domElement);
-
-    // =========================================
-    // إعدادات الكاميرا (ثابتة + أزرار تحكم)
-    // =========================================
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.target.set(0, 0, 0);
-    controls.enableDamping = true;
-    
-    // قفل التحكم اليدوي (الرقعة ثابتة)
-    controls.enableRotate = false; // منع التدوير بالسحب
-    controls.enablePan = false;    // منع تحريك الرقعة
-    
-    // السماح فقط بالتقريب والتبعيد
-    controls.minDistance = 6;   
-    controls.maxDistance = 20;  
-    
-    controls.update();
-
-    // الإضاءة
-    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-    const light = new THREE.DirectionalLight(0xfff5e6, 2);
-    light.position.set(5, 15, 5);
-    light.castShadow = true;
-    light.shadow.mapSize.width = 1024;
-    light.shadow.mapSize.height = 1024;
-    scene.add(light);
-
-    const backLight = new THREE.PointLight(0x4455ff, 1, 20);
-    backLight.position.set(0, 5, -8);
-    scene.add(backLight);
-
-    const boardGroup = new THREE.Group(); scene.add(boardGroup);
-    const piecesGroup = new THREE.Group(); scene.add(piecesGroup);
-
-    const raycaster = new THREE.Raycaster();
-    const pointer = new THREE.Vector2();
-
-    let selected = null; let busy = false; let squares = []; let pieceMeshes = [];
-    const files = "abcdefgh";
-
-    // المواد (رخام وذهب)
-    const goldMat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 1.0, roughness: 0.2 });
-    const darkMarbleMat = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.2, metalness: 0.1 });
-    const lightMarbleMat = new THREE.MeshStandardMaterial({ color: 0xf5f5f5, roughness: 0.2, metalness: 0.1 });
-    const whitePieceMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.15, metalness: 0.1 });
-    const blackPieceMat = new THREE.MeshStandardMaterial({ color: 0x0a0a0a, roughness: 0.3, metalness: 0.2 });
-
-    // الرقعة
-    const frame = new THREE.Mesh(new THREE.BoxGeometry(9.6, 0.5, 9.6), goldMat);
-    frame.position.y = -0.26; 
-    frame.receiveShadow = true; frame.castShadow = true;
-    boardGroup.add(frame);
-
-    function makeSquare(x, z, isDark) {
-        const mesh = new THREE.Mesh(
-            new THREE.BoxGeometry(1, 0.2, 1),
-            isDark ? darkMarbleMat : lightMarbleMat
-        );
-        mesh.position.set(x, 0, z); 
-        mesh.receiveShadow = true;
-        mesh.userData = { square: true, isDark: isDark };
-        boardGroup.add(mesh); 
-        squares.push(mesh);
-    }
-
-    for (let r = 0; r < 8; r++) {
-        for (let f = 0; f < 8; f++) {
-            makeSquare(f - 3.5, 3.5 - r, (r + f) % 2 !== 0);
-        }
-    }
-
-    // البيادق الفخمة
-    function createLuxuryPiece(type, color) {
-        const group = new THREE.Group();
-        const mat = color === "w" ? whitePieceMat : blackPieceMat;
-        
-        const add = (geo, y, scaleX=1, scaleY=1, scaleZ=1, customMat=mat) => {
-            const m = new THREE.Mesh(geo, customMat);
-            m.position.y = y;
-            m.scale.set(scaleX, scaleY, scaleZ);
-            m.castShadow = true; m.receiveShadow = true;
-            group.add(m);
-            return m;
+        const symbols = {
+            'wp': '♙', 'wn': '♘', 'wb': '♗', 'wr': '♖', 'wq': '♕', 'wk': '♔',
+            'bp': '♟', 'bn': '♞', 'bb': '♝', 'br': '♜', 'bq': '♛', 'bk': '♚'
         };
 
-        add(new THREE.CylinderGeometry(0.4, 0.45, 0.15, 32), 0.075); 
-        add(new THREE.CylinderGeometry(0.3, 0.4, 0.1, 32), 0.2);     
-        add(new THREE.TorusGeometry(0.35, 0.03, 16, 32), 0.15, 1, 1, 1, goldMat).rotation.x = Math.PI / 2; 
+        function renderBoard() {
+            const boardElement = document.getElementById('board');
+            boardElement.innerHTML = '';
+            const boardState = game.board();
 
-        switch (type) {
-            case "p":
-                add(new THREE.CylinderGeometry(0.15, 0.25, 0.4, 32), 0.45);
-                add(new THREE.TorusGeometry(0.15, 0.02, 16, 32), 0.65, 1, 1, 1, goldMat).rotation.x = Math.PI / 2;
-                add(new THREE.SphereGeometry(0.15, 32, 16), 0.8);
-                break;
-            case "r":
-                add(new THREE.CylinderGeometry(0.25, 0.3, 0.5, 32), 0.5);
-                add(new THREE.CylinderGeometry(0.32, 0.32, 0.1, 32), 0.8);
-                add(new THREE.CylinderGeometry(0.35, 0.35, 0.15, 32), 0.9);
-                add(new THREE.TorusGeometry(0.32, 0.02, 16, 32), 0.8, 1, 1, 1, goldMat).rotation.x = Math.PI / 2;
-                break;
-            case "n":
-                add(new THREE.CylinderGeometry(0.15, 0.25, 0.4, 32), 0.45);
-                const head = add(new THREE.BoxGeometry(0.25, 0.4, 0.2), 0.75);
-                head.rotation.x = -0.4; head.position.z = 0.1;
-                add(new THREE.ConeGeometry(0.05, 0.15, 8), 1.0, 1, 1, 1, goldMat).position.z = 0.05;
-                break;
-            case "b":
-                add(new THREE.CylinderGeometry(0.18, 0.25, 0.6, 32), 0.55);
-                add(new THREE.SphereGeometry(0.22, 32, 16), 0.9);
-                add(new THREE.ConeGeometry(0.1, 0.2, 32), 1.15);
-                add(new THREE.SphereGeometry(0.05, 16, 16), 1.25, 1, 1, 1, goldMat);
-                break;
-            case "q":
-                add(new THREE.CylinderGeometry(0.2, 0.28, 0.7, 32), 0.6);
-                add(new THREE.TorusGeometry(0.22, 0.03, 16, 32), 0.95, 1, 1, 1, goldMat).rotation.x = Math.PI / 2;
-                add(new THREE.CylinderGeometry(0.25, 0.25, 0.1, 32), 1.0);
-                for(let i=0; i<6; i++) {
-                    const angle = (i * Math.PI * 2) / 6;
-                    const spike = new THREE.Mesh(new THREE.ConeGeometry(0.04, 0.15, 8), goldMat);
-                    spike.position.set(Math.cos(angle)*0.2, 1.1, Math.sin(angle)*0.2);
-                    spike.castShadow = true;
-                    group.add(spike);
+            for (let r = 0; r < 8; r++) {
+                for (let c = 0; c < 8; c++) {
+                    const file = String.fromCharCode(97 + c); 
+                    const rank = 8 - r;
+                    const squareName = file + rank;
+
+                    const squareDiv = document.createElement('div');
+                    squareDiv.className = 'square';
+                    squareDiv.dataset.square = squareName;
+
+                    const piece = boardState[r][c];
+                    if (piece) {
+                        const pieceSpan = document.createElement('span');
+                        const pieceKey = piece.color + piece.type;
+                        pieceSpan.textContent = symbols[pieceKey];
+                        pieceSpan.className = 'piece ' + (piece.color === 'w' ? 'piece-w' : 'piece-b');
+                        squareDiv.appendChild(pieceSpan);
+                    }
+
+                    squareDiv.addEventListener('click', () => handleSquareClick(squareName));
+                    boardElement.appendChild(squareDiv);
                 }
-                add(new THREE.SphereGeometry(0.06, 16, 16), 1.2, 1, 1, 1, goldMat);
-                break;
-            case "k":
-                add(new THREE.CylinderGeometry(0.2, 0.28, 0.8, 32), 0.65);
-                add(new THREE.TorusGeometry(0.22, 0.03, 16, 32), 1.05, 1, 1, 1, goldMat).rotation.x = Math.PI / 2;
-                add(new THREE.CylinderGeometry(0.25, 0.25, 0.1, 32), 1.1);
-                add(new THREE.BoxGeometry(0.06, 0.25, 0.06), 1.27, 1, 1, 1, goldMat);
-                add(new THREE.BoxGeometry(0.18, 0.06, 0.06), 1.3, 1, 1, 1, goldMat);
-                break;
+            }
+            updateHighlights();
         }
-        
-        if(color === 'b') {
-            group.traverse((child) => {
-                if(child.isMesh && child.material === blackPieceMat) child.material.emissive = new THREE.Color(0x222233);
+
+        function handleSquareClick(square) {
+            if (isThinking || game.game_over() || game.turn() !== 'w') return;
+            
+            hintSquare = null;
+
+            const piece = game.get(square);
+
+            if (!selectedSquare) {
+                if (piece && piece.color === 'w') {
+                    selectedSquare = square;
+                    renderBoard();
+                }
+                return;
+            }
+
+            const moves = game.moves({ square: selectedSquare, verbose: true });
+            const move = moves.find(m => m.to === square);
+
+            if (move) {
+                game.move({ from: selectedSquare, to: square, promotion: 'q' });
+                selectedSquare = null;
+                renderBoard();
+                
+                if (checkGameOver()) return;
+
+                isThinking = true;
+                setTimeout(makeComputerMove, 300); 
+            } else {
+                if (piece && piece.color === 'w') {
+                    selectedSquare = square;
+                    renderBoard();
+                } else {
+                    selectedSquare = null;
+                    renderBoard();
+                }
+            }
+        }
+
+        function updateHighlights() {
+            document.querySelectorAll('.square').forEach(sq => sq.classList.remove('selected', 'valid-move', 'valid-capture'));
+            
+            if (!selectedSquare) return;
+
+            const selectedDiv = document.querySelector(`[data-square="${selectedSquare}"]`);
+            if (selectedDiv) selectedDiv.classList.add('selected');
+
+            const moves = game.moves({ square: selectedSquare, verbose: true });
+            moves.forEach(m => {
+                const targetDiv = document.querySelector(`[data-square="${m.to}"]`);
+                if (targetDiv) {
+                    if (m.flags.includes('c') || m.flags.includes('e')) {
+                        targetDiv.classList.add('valid-capture');
+                    } else {
+                        targetDiv.classList.add('valid-move');
+                    }
+                }
             });
         }
-        return group;
-    }
 
-    function squarePos(s) { return { x: files.indexOf(s[0]) - 3.5, z: 3.5 - (Number(s[1]) - 1) }; }
+        function makeComputerMove() {
+            const moves = game.moves();
+            if (moves.length === 0) return;
 
-    function drawPieces() {
-        piecesGroup.clear(); pieceMeshes = [];
-        const boardState = game.board();
-        for (let r = 0; r < 8; r++) {
-            for (let f = 0; f < 8; f++) {
-                const p = boardState[r][f];
-                if (!p) continue;
-                const s = files[f] + (8 - r);
-                const pos = squarePos(s);
-                const obj = createLuxuryPiece(p.type, p.color);
-                obj.position.set(pos.x, 0.1, pos.z);
-                obj.userData = { position: s, color: p.color, type: p.type };
-                piecesGroup.add(obj); pieceMeshes.push(obj);
-            }
-        }
-    }
+            let bestMove = null;
+            let bestValue = -9999;
+            const pieceValues = { p: 10, n: 30, b: 30, r: 50, q: 90, k: 900 };
 
-    function clearHighlights() {
-        squares.forEach(s => { s.material = s.userData.isDark ? darkMarbleMat : lightMarbleMat; });
-    }
-
-    function highlightMoves(from) {
-        clearHighlights();
-        const moves = game.moves({ square: from, verbose: true });
-        moves.forEach(m => {
-            const pos = squarePos(m.to);
-            const sqr = squares.find(s => Math.abs(s.position.x - pos.x) < 0.01 && Math.abs(s.position.z - pos.z) < 0.01);
-            if (sqr) {
-                sqr.material = new THREE.MeshStandardMaterial({ 
-                    color: game.get(m.to) ? 0xff0000 : 0x00ff00, 
-                    emissive: game.get(m.to) ? 0x550000 : 0x005500,
-                    transparent: true, opacity: 0.7
+            moves.forEach(move => {
+                game.move(move);
+                let boardValue = 0;
+                game.board().forEach(row => {
+                    row.forEach(piece => {
+                        if (piece) {
+                            let val = pieceValues[piece.type];
+                            boardValue += piece.color === 'b' ? val : -val;
+                        }
+                    });
                 });
+                game.undo();
+
+                boardValue += Math.random() * 30;
+
+                if (boardValue > bestValue) {
+                    bestValue = boardValue;
+                    bestMove = move;
+                }
+            });
+
+            game.move(bestMove);
+            isThinking = false;
+            selectedSquare = null;
+            renderBoard();
+            checkGameOver();
+        }
+
+        function checkGameOver() {
+            const winScreen = document.getElementById('win-screen');
+            const winTitle = document.getElementById('win-title');
+
+            if (game.in_checkmate()) {
+                winTitle.textContent = game.turn() === 'w' ? '💀 خسارة' : '🏆 فوز ساحق!';
+                winTitle.style.color = game.turn() === 'w' ? '#ff4d4d' : '#ffd700';
+                winScreen.style.display = 'flex';
+                return true;
+            } else if (game.in_draw()) {
+                winTitle.textContent = '🤝 تعادل';
+                winScreen.style.display = 'flex';
+                return true;
             }
-        });
-    }
-
-    function status(text) { document.getElementById("status").textContent = text; }
-
-    function finishCheck() {
-        if (game.isCheckmate()) { status("🏆 كش مات! " + (game.turn() === "w" ? "الأسود فاز" : "أنت فزت!")); return true; }
-        if (game.isDraw()) { status("🤝 تعادل!"); return true; }
-        if (game.isCheck()) { status("⚠️ كش!"); return false; }
-        status(game.turn() === "w" ? "دورك الآن" : "🤖 الكمبيوتر يفكر...");
-        return false;
-    }
-
-    function playerMove(from, to) {
-        const move = game.move({ from, to, promotion: "q" });
-        if (!move) return false;
-        drawPieces(); clearHighlights(); selected = null; return true;
-    }
-
-    function evaluate() { let score = 0; const values = { p: 100, n: 320, b: 330, r: 500, q: 900, k: 20000 }; game.board().forEach(row => row.forEach(p => { if (p) score += (p.color === "b" ? 1 : -1) * values[p.type]; })); return score; }
-
-    function minimax(depth, alpha, beta, maximizing) {
-        if (depth === 0 || game.isGameOver()) return evaluate();
-        const moves = game.moves();
-        if (maximizing) {
-            let best = -Infinity;
-            for (const m of moves) { game.move(m); best = Math.max(best, minimax(depth - 1, alpha, beta, false)); game.undo(); alpha = Math.max(alpha, best); if (beta <= alpha) break; }
-            return best;
-        } else {
-            let best = Infinity;
-            for (const m of moves) { game.move(m); best = Math.min(best, minimax(depth - 1, alpha, beta, true)); game.undo(); beta = Math.min(beta, best); if (beta <= alpha) break; }
-            return best;
-        }
-    }
-
-    function computerMove() {
-        if (game.isGameOver()) return;
-        const moves = game.moves(); if (!moves.length) return;
-        const hard = document.getElementById("level").value === "hard";
-        let chosen;
-        if (!hard) {
-            const captures = moves.filter(m => m.includes("x"));
-            const pool = Math.random() < 0.5 && captures.length ? captures : moves;
-            chosen = pool[Math.floor(Math.random() * pool.length)];
-        } else {
-            let best = -Infinity;
-            for (const m of moves) { game.move(m); const score = minimax(2, -Infinity, Infinity, false); game.undo(); if (score > best) { best = score; chosen = m; } }
-        }
-        game.move(chosen); drawPieces(); finishCheck();
-    }
-
-    // التفاعل (اللمس) - يعتمد على النقر وليس السحب
-    let touchStartX = 0;
-    let touchStartY = 0;
-
-    holder.addEventListener("pointerdown", (e) => {
-        touchStartX = e.clientX;
-        touchStartY = e.clientY;
-    });
-
-    holder.addEventListener("pointerup", (e) => {
-        // إذا تحرك الإصبع أكثر من 10 بكسل، نعتبره سحب للكاميرا وليس نقرة
-        if (Math.abs(e.clientX - touchStartX) > 10 || Math.abs(e.clientY - touchStartY) > 10) return;
-        
-        if (busy || game.isGameOver() || game.turn() !== "w") return;
-
-        const rect = renderer.domElement.getBoundingClientRect();
-        pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-        pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-        raycaster.setFromCamera(pointer, camera);
-
-        const hit = raycaster.intersectObjects(pieceMeshes, true);
-        let clicked = null;
-        if (hit.length) { let o = hit[0].object; while (o.parent && o.parent !== piecesGroup) o = o.parent; if (o.parent === piecesGroup) clicked = o; }
-
-        if (clicked && clicked.userData.color === "w") { 
-            selected = clicked.userData.position; 
-            highlightMoves(selected); 
-            return; 
+            return false;
         }
 
-        const squareHit = raycaster.intersectObjects(squares);
-        if (squareHit.length && selected) {
-            const s = squareHit[0].object;
-            const f = Math.round(s.position.x + 3.5);
-            const rank = 8 - Math.round(3.5 - s.position.z);
-            const to = files[f] + rank;
-            if (playerMove(selected, to)) {
-                if (!finishCheck()) { busy = true; setTimeout(() => { computerMove(); busy = false; }, 350); }
+        function restartGame() {
+            game.reset();
+            selectedSquare = null;
+            isThinking = false;
+            hintSquare = null;
+            document.getElementById('win-screen').style.display = 'none';
+            renderBoard();
+        }
+
+        function undoMove() {
+            if (isThinking || game.history().length < 2) return;
+            game.undo(); 
+            game.undo(); 
+            selectedSquare = null;
+            hintSquare = null;
+            renderBoard();
+        }
+
+        function showHint() {
+            if (isThinking || game.turn() !== 'w') return;
+            const moves = game.moves({ verbose: true });
+            if (moves.length > 0) {
+                const randomMove = moves[Math.floor(Math.random() * moves.length)];
+                hintSquare = randomMove.from;
+                
+                document.querySelectorAll('.square').forEach(sq => {
+                    sq.style.boxShadow = "none";
+                    sq.style.backgroundColor = "transparent";
+                });
+                const hDiv = document.querySelector(`[data-square="${hintSquare}"]`);
+                if (hDiv) {
+                    hDiv.style.boxShadow = "inset 0 0 20px 5px #00ffff";
+                    hDiv.style.backgroundColor = "rgba(0, 255, 255, 0.4)";
+                }
             }
         }
-    });
 
-    // إدارة الواجهة
-    window.startGame = function() {
-        document.getElementById("main-menu").style.display = "none";
-        document.getElementById("game-container").style.display = "flex";
-        setTimeout(() => {
-            const w = holder.clientWidth; const h = holder.clientHeight;
-            if (w > 0 && h > 0) { camera.aspect = w / h; camera.updateProjectionMatrix(); renderer.setSize(w, h); }
-        }, 100);
-        game.reset(); drawPieces(); clearHighlights(); status("دورك الآن - الأبيض");
-        setCameraView('default');
-    };
-
-    window.exitGame = function() {
-        document.getElementById("game-container").style.display = "none";
-        document.getElementById("main-menu").style.display = "block";
-    };
-
-    window.restart = function() { game.reset(); drawPieces(); clearHighlights(); status("دورك الآن - الأبيض"); };
-    window.undo = function() { if (busy || game.history().length < 2) return; game.undo(); game.undo(); drawPieces(); clearHighlights(); status("تم التراجع"); };
-
-    // =========================================
-    // تغيير زوايا الكاميرا بسلاسة
-    // =========================================
-    let targetCameraPos = new THREE.Vector3(0, 11, 11);
-    let isCameraAnimating = false;
-
-    window.setCameraView = function(view) {
-        if (view === 'default') {
-            targetCameraPos.set(0, 11, 11);
-        } else if (view === 'top') {
-            targetCameraPos.set(0, 16, 0.1); // زاوية من فوق
-        } else if (view === 'side') {
-            targetCameraPos.set(13, 4, 0);   // زاوية جانبية
-        }
-        isCameraAnimating = true;
-    };
-
-    function animate() { 
-        requestAnimationFrame(animate); 
-        
-        // حركة الكاميرا السلسة
-        if (isCameraAnimating) {
-            camera.position.lerp(targetCameraPos, 0.1);
-            if (camera.position.distanceTo(targetCameraPos) < 0.1) {
-                camera.position.copy(targetCameraPos);
-                isCameraAnimating = false;
-            }
-            controls.target.set(0, 0, 0);
-        }
-
-        controls.update(); 
-        renderer.render(scene, camera); 
-    }
-    animate();
-
-    window.addEventListener("resize", () => {
-        const w = holder.clientWidth; const h = holder.clientHeight;
-        if (w > 0 && h > 0) { camera.aspect = w / h; camera.updateProjectionMatrix(); renderer.setSize(w, h); }
-    });
+        restartGame();
     </script>
 </body>
 </html>
