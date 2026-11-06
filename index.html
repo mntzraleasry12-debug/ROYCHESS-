@@ -2,75 +2,92 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>شطرنج 3D</title>
     <style>
-        /* إعدادات عامة */
+        /* إعدادات الصفحة الأساسية */
         body {
             margin: 0;
             padding: 0;
-            font-family: 'Arial', sans-serif;
-            background-color: #000;
-            height: 100vh;
-            overflow: hidden;
-            user-select: none;
-        }
-
-        /* الواجهة الرئيسية باستخدام الصورة */
-        #main-menu {
-            width: 100vw;
-            height: 100vh;
-            /* استدعاء الصورة الخاصة بك */
-            background: url('menu.png') no-repeat center center;
-            background-size: cover;
-            position: relative;
+            background-color: #000; /* خلفية سوداء لتملأ الفراغات */
             display: flex;
             justify-content: center;
             align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
         }
 
-        /* أزرار شفافة فوق الصورة (Hotspots) */
+        /* الحاوية التي تضم الصورة والأزرار */
+        /* هذا الكود يضمن أن الصورة لا تتشوه أبداً وتحافظ على أبعادها */
+        #menu-wrapper {
+            position: relative;
+            display: inline-block;
+            height: 100%;
+            max-height: 100vh;
+        }
+
+        /* الصورة */
+        #menu-image {
+            height: 100vh;
+            width: auto;
+            max-width: 100vw;
+            display: block;
+            object-fit: contain; /* يضمن عدم قص الصورة */
+        }
+
+        /* الأزرار الشفافة */
         .hotspot {
             position: absolute;
             cursor: pointer;
-            /* إزالة الخلفية لجعلها شفافة */
-            background-color: transparent;
             border: none;
             outline: none;
+            background-color: rgba(255, 0, 0, 0); /* شفافة */
+            transition: background-color 0.2s;
         }
 
-        /* تحديد مكان زر الترس (أعلى اليسار) */
+        /* 1. زر الترس (الإعدادات) */
         #btn-settings {
             top: 2%;
             left: 2%;
             width: 12%;
             height: 8%;
-            /* لإظهار الزر للتأكد من مكانه، قم بإزالة التعليق عن السطر التالي */
-            /* background-color: rgba(255, 0, 0, 0.3); */
         }
 
-        /* تحديد مكان زر تحدي الأصدقاء (أسفل اليسار) */
+        /* 2. زر تحدي الأصدقاء */
         #btn-friends {
             bottom: 10%;
             left: 5%;
             width: 42%;
-            height: 20%;
-            /* background-color: rgba(0, 255, 0, 0.3); */
+            height: 18%;
         }
 
-        /* تحديد مكان زر العب ضد الكمبيوتر (أسفل اليمين) */
+        /* 3. زر العب ضد الكمبيوتر */
         #btn-computer {
             bottom: 10%;
             right: 5%;
             width: 42%;
-            height: 20%;
-            /* background-color: rgba(0, 0, 255, 0.3); */
+            height: 18%;
         }
 
-        /* تأثير بسيط عند الضغط */
-        .hotspot:active { transform: scale(0.98); }
+        /* زر وهمي لتفعيل وضع التعديل (لمعرفة أماكن الأزرار) */
+        #debug-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 9999;
+            background: #00ff00;
+            color: black;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 5px;
+            font-size: 12px;
+            opacity: 0.5;
+        }
 
-        /* نافذة الإعدادات (Modal) */
+        /* --- باقي الإعدادات واللعبة --- */
         #settings-modal {
             display: none;
             position: absolute;
@@ -85,28 +102,11 @@
             color: white;
             text-align: center;
             width: 250px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.9);
         }
         #settings-modal h2 { margin-top: 0; color: #ffd700; }
-        .setting-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 15px 0;
-            font-size: 18px;
-        }
-        .close-btn {
-            margin-top: 15px;
-            padding: 10px 20px;
-            background: #d500f9;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: bold;
-        }
+        .setting-row { display: flex; justify-content: space-between; margin: 15px 0; font-size: 18px; }
+        .close-btn { margin-top: 15px; padding: 10px; background: #d500f9; color: white; border: none; border-radius: 10px; width: 100%; cursor: pointer; }
 
-        /* منطقة اللعبة */
         #game-container {
             display: none;
             width: 100vw;
@@ -122,7 +122,6 @@
             z-index: 2000;
         }
         
-        /* الرقعة 3D */
         .board-3d {
             width: 320px;
             height: 320px;
@@ -142,20 +141,14 @@
             justify-content: center;
             align-items: center;
             font-size: 30px;
-            /* عكس التدوير للبيادق لتظهر 2D */
-            transform: rotateZ(-45deg) rotateX(-45deg); 
+            transform: rotateZ(-45deg) rotateX(-45deg);
             cursor: pointer;
         }
         .square.white { background-color: #f0d9b5; }
         .square.black { background-color: #b58863; }
 
-        .piece-2d {
-            font-size: 40px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
-            user-select: none;
-        }
+        .piece-2d { font-size: 40px; user-select: none; }
 
-        /* زر العودة */
         .back-btn {
             position: absolute;
             top: 20px;
@@ -165,13 +158,8 @@
             color: white;
             border: none;
             border-radius: 10px;
-            font-size: 16px;
-            font-weight: bold;
             cursor: pointer;
-            z-index: 100;
         }
-        
-        audio { display: none; }
     </style>
 </head>
 <body>
@@ -181,9 +169,15 @@
         <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=chess-think-110112.mp3" type="audio/mpeg">
     </audio>
 
-    <!-- الواجهة الرئيسية -->
-    <div id="main-menu">
-        <!-- الأزرار الشفافة التي تغطي أزرار الصورة -->
+    <!-- زر التعديل (يمكنك حذفه لاحقاً إذا أردت) -->
+    <button id="debug-btn" onclick="toggleDebug()">تعديل الأزرار</button>
+
+    <!-- الواجهة -->
+    <div id="menu-wrapper">
+        <!-- الصورة الخاصة بك (تأكد أن اسمها menu.png) -->
+        <img id="menu-image" src="menu.png" alt="القائمة">
+        
+        <!-- الأزرار الشفافة فوق الصورة -->
         <button class="hotspot" id="btn-settings" onclick="openSettings()"></button>
         <button class="hotspot" id="btn-friends" onclick="startGame('friends')"></button>
         <button class="hotspot" id="btn-computer" onclick="startGame('computer')"></button>
@@ -203,88 +197,66 @@
         <button class="close-btn" onclick="closeSettings()">إغلاق</button>
     </div>
 
-    <!-- حاوية اللعبة -->
+    <!-- اللعبة -->
     <div id="game-container">
         <button class="back-btn" onclick="goBack()">عودة</button>
-        <div class="board-3d" id="chessboard">
-            <!-- سيتم توليد الرقعة عبر الجافاسكريبت -->
-        </div>
+        <div class="board-3d" id="chessboard"></div>
     </div>
 
     <script>
-        // --- إدارة الأصوات ---
+        // --- أصوات ---
         const bgMusic = document.getElementById('bg-music');
         bgMusic.volume = 0.2;
-
-        // توليد صوت "نقرة" برمجياً
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
         let audioCtx;
 
         function playClick() {
             if (!document.getElementById('sfx-toggle').checked) return;
-            
-            if (!audioCtx) audioCtx = new AudioContext();
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             const osc = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
-            
             osc.type = 'triangle';
             osc.frequency.setValueAtTime(600, audioCtx.currentTime);
             osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.1);
-            
             gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
             gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-            
             osc.connect(gainNode);
             gainNode.connect(audioCtx.destination);
-            
             osc.start();
             osc.stop(audioCtx.currentTime + 0.1);
         }
 
-        // تشغيل الموسيقى عند أول تفاعل
         document.body.addEventListener('click', function initAudio() {
-            if(document.getElementById('music-toggle').checked) {
-                bgMusic.play().catch(e => console.log("المتصفح منع الصوت التلقائي"));
-            }
-            if(!audioCtx) audioCtx = new AudioContext(); 
+            if(document.getElementById('music-toggle').checked) bgMusic.play().catch(e => {});
+            if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             document.body.removeEventListener('click', initAudio);
         }, { once: true });
 
         function toggleMusic() {
-            if(document.getElementById('music-toggle').checked) {
-                bgMusic.play();
-            } else {
-                bgMusic.pause();
-            }
+            if(document.getElementById('music-toggle').checked) bgMusic.play();
+            else bgMusic.pause();
         }
 
         // --- الإعدادات ---
-        function openSettings() {
-            playClick();
-            document.getElementById('settings-modal').style.display = 'block';
+        function openSettings() { playClick(); document.getElementById('settings-modal').style.display = 'block'; }
+        function closeSettings() { playClick(); document.getElementById('settings-modal').style.display = 'none'; }
+
+        // --- وضع التعديل (لرؤية الأزرار) ---
+        let isDebug = false;
+        function toggleDebug() {
+            isDebug = !isDebug;
+            const hotspots = document.querySelectorAll('.hotspot');
+            const colors = ['rgba(255, 0, 0, 0.5)', 'rgba(0, 255, 0, 0.5)', 'rgba(0, 0, 255, 0.5)'];
+            hotspots.forEach((btn, index) => {
+                btn.style.backgroundColor = isDebug ? colors[index] : 'rgba(255, 0, 0, 0)';
+            });
         }
 
-        function closeSettings() {
-            playClick();
-            document.getElementById('settings-modal').style.display = 'none';
-        }
-
-        // --- توليد الرقعة (2D Pieces on 3D Board) ---
+        // --- الرقعة والبيادق ---
         const boardElement = document.getElementById('chessboard');
-        const pieces2D = {
-            'r': '♜', 'n': '♞', 'b': '♝', 'q': '♛', 'k': '♚', 'p': '♟',
-            'R': '♖', 'N': '♘', 'B': '♗', 'Q': '♕', 'K': '♔', 'P': '♙'
-        };
-
+        const pieces2D = { 'r': '♜', 'n': '♞', 'b': '♝', 'q': '♛', 'k': '♚', 'p': '♟', 'R': '♖', 'N': '♘', 'B': '♗', 'Q': '♕', 'K': '♔', 'P': '♙' };
         const initialBoard = [
-            ['r','n','b','q','k','b','n','r'],
-            ['p','p','p','p','p','p','p','p'],
-            ['','','','','','','',''],
-            ['','','','','','','',''],
-            ['','','','','','','',''],
-            ['','','','','','','',''],
-            ['P','P','P','P','P','P','P','P'],
-            ['R','N','B','Q','K','B','N','R']
+            ['r','n','b','q','k','b','n','r'], ['p','p','p','p','p','p','p','p'], ['','','','','','','',''], ['','','','','','','',''],
+            ['','','','','','','',''], ['','','','','','','',''], ['P','P','P','P','P','P','P','P'], ['R','N','B','Q','K','B','N','R']
         ];
 
         function createBoard() {
@@ -293,7 +265,6 @@
                 for (let col = 0; col < 8; col++) {
                     const square = document.createElement('div');
                     square.className = `square ${(row + col) % 2 === 0 ? 'white' : 'black'}`;
-                    
                     const pieceCode = initialBoard[row][col];
                     if (pieceCode !== '') {
                         const pieceDiv = document.createElement('div');
@@ -302,29 +273,24 @@
                         pieceDiv.style.color = (pieceCode === pieceCode.toLowerCase()) ? '#000' : '#fff';
                         square.appendChild(pieceDiv);
                     }
-                    
-                    square.addEventListener('click', () => {
-                        playClick();
-                    });
-
+                    square.addEventListener('click', playClick);
                     boardElement.appendChild(square);
                 }
             }
         }
 
-        // --- بدء اللعبة ---
+        // --- تشغيل اللعبة والعودة ---
         function startGame(mode) {
             playClick();
-            document.getElementById('main-menu').style.display = 'none';
+            document.getElementById('menu-wrapper').style.display = 'none';
             document.getElementById('game-container').style.display = 'flex';
             createBoard(); 
         }
 
-        // --- العودة للقائمة ---
         function goBack() {
             playClick();
             document.getElementById('game-container').style.display = 'none';
-            document.getElementById('main-menu').style.display = 'flex';
+            document.getElementById('menu-wrapper').style.display = 'block';
         }
     </script>
 </body>
