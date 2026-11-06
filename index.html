@@ -2,154 +2,393 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>شطرنج 3D - القائمة</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&display=swap" rel="stylesheet">
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>شطرنج 3D</title>
     <style>
-        * {
-            box-sizing: border-box;
+        /* إعدادات عامة */
+        body {
             margin: 0;
             padding: 0;
-            font-family: 'Cairo', sans-serif;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body, html {
-            width: 100vw;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(180deg, #004d00, #008000);
             height: 100vh;
             overflow: hidden;
-            background-color: #111;
-        }
-
-        #menu-screen {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-image: url('menu.png');
-            background-size: 100% 100%; /* لضمان تطابق الأزرار دائماً */
-            background-position: center;
-            z-index: 10;
-        }
-
-        /* المناطق الشفافة القابلة للنقر */
-        .click-zone {
-            position: absolute;
-            cursor: pointer;
-            border-radius: 15px;
-            transition: 0.1s;
-        }
-        
-        .click-zone:active { 
-            transform: scale(0.96); 
-            background: rgba(255,255,255,0.2); 
-        }
-
-        /* إحداثيات الأزرار */
-        .btn-settings-zone { top: 2%; left: 3%; width: 12%; height: 6%; }
-        .btn-friends-zone { top: 70%; left: 3%; width: 44%; height: 17%; }
-        .btn-cpu-zone { top: 70%; right: 3%; width: 44%; height: 17%; }
-
-        /* ================= قائمة الإعدادات ================= */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            display: none;
+            display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 100;
-            backdrop-filter: blur(8px);
+            user-select: none;
         }
 
-        .settings-modal {
-            background: #1a1a1a;
-            border: 3px solid #ffcc00;
+        /* زر الإعدادات */
+        .settings-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 50px;
+            height: 50px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ccc"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>') no-repeat center center;
+            background-size: cover;
+            cursor: pointer;
+            z-index: 100;
+            transition: transform 0.3s;
+        }
+        .settings-btn:hover { transform: rotate(90deg); }
+
+        /* واجهة القائمة الرئيسية */
+        #main-menu {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            justify-content: center;
+            background: url('https://www.transparenttextures.com/patterns/stardust.png'); /* نسيج خفيف */
+        }
+
+        /* الشعار والدرع */
+        .shield-container {
+            position: relative;
+            width: 300px;
+            height: 250px;
+            background: linear-gradient(180deg, #800000, #4a0000);
+            border: 4px solid #ffd700;
+            border-radius: 50% 50% 10px 10px / 60% 60% 10px 10px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 50px;
+        }
+        .shield-container h1 {
+            color: #ffd700;
+            font-size: 40px;
+            margin: 0;
+            text-shadow: 2px 2px 4px #000;
+        }
+        .shield-container span {
+            color: #fff;
+            font-size: 30px;
+            font-weight: bold;
+        }
+
+        /* الأزرار */
+        .buttons-container {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .game-btn {
+            width: 160px;
+            height: 120px;
             border-radius: 20px;
-            width: 90%;
-            max-width: 350px;
-            padding: 25px;
+            border: 3px solid;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            padding-bottom: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 2px #000;
+            transition: transform 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .game-btn:active { transform: scale(0.95); }
+        
+        .btn-friends {
+            background: linear-gradient(180deg, #d500f9, #7b1fa2);
+            border-color: #e040fb;
+            box-shadow: 0 0 15px #d500f9;
+        }
+        .btn-computer {
+            background: linear-gradient(180deg, #ffb300, #ff6f00);
+            border-color: #ffca28;
+            box-shadow: 0 0 15px #ffb300;
+        }
+
+        /* الرموز داخل الأزرار */
+        .icon-pawns { font-size: 40px; margin-bottom: 5px; }
+
+        /* نافذة الإعدادات (Modal) */
+        #settings-modal {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #222;
+            border: 2px solid #ffd700;
+            border-radius: 15px;
+            padding: 20px;
+            z-index: 1000;
             color: white;
             text-align: center;
+            width: 250px;
         }
-
-        .settings-modal h2 { color: #ffcc00; margin-bottom: 20px; }
-
-        .setting-item {
+        #settings-modal h2 { margin-top: 0; color: #ffd700; }
+        .setting-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #333;
+            margin: 15px 0;
+            font-size: 18px;
         }
-
-        .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider {
-            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #555; transition: .4s; border-radius: 34px;
-        }
-        .slider:before {
-            position: absolute; content: ""; height: 18px; width: 18px;
-            left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%;
-        }
-        input:checked + .slider { background-color: #ffcc00; }
-        input:checked + .slider:before { transform: translateX(24px); }
-
         .close-btn {
-            background: #ffcc00; color: #000; border: none; padding: 12px;
-            font-size: 18px; font-weight: bold; border-radius: 10px; cursor: pointer; width: 100%;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: #d500f9;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
         }
+
+        /* منطقة اللعبة */
+        #game-container {
+            display: none;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: #1a1a1a;
+            perspective: 1000px; /* لرؤية الرقعة ثلاثية الأبعاد */
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        
+        /* الرقعة 3D */
+        .board-3d {
+            width: 400px;
+            height: 400px;
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(8, 1fr);
+            transform: rotateX(45deg) rotateZ(45deg); /* تحويل الرقعة لتبدو 3D */
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            border: 5px solid #333;
+        }
+
+        .square {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 40px;
+            /* البيادق مسطحة 2D */
+            transform: rotateZ(-45deg) rotateX(-45deg); 
+            cursor: pointer;
+        }
+        .square.white { background-color: #f0d9b5; }
+        .square.black { background-color: #b58863; }
+
+        .piece-2d {
+            font-size: 50px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            user-select: none;
+        }
+
+        /* زر العودة */
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: #f44336;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* إخفاء الأصوات */
+        audio { display: none; }
     </style>
 </head>
 <body>
 
-    <div id="menu-screen">
-        <!-- عند النقر على الترس، تفتح الإعدادات -->
-        <div class="click-zone btn-settings-zone" onclick="openSettings()"></div>
-        
-        <!-- عند النقر، ينتقل إلى اللعبة بوضع الأصدقاء -->
-        <div class="click-zone btn-friends-zone" onclick="goToGame('friend')"></div>
-        
-        <!-- عند النقر، ينتقل إلى اللعبة بوضع الكمبيوتر -->
-        <div class="click-zone btn-cpu-zone" onclick="goToGame('cpu')"></div>
-    </div>
+    <!-- الأصوات -->
+    <audio id="bg-music" loop>
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="click-sound">
+        <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
+    </audio>
 
-    <!-- قائمة الإعدادات الخاصة بالقائمة الرئيسية -->
-    <div class="modal-overlay" id="settingsModal">
-        <div class="settings-modal">
-            <h2>⚙️ الإعدادات</h2>
-            
-            <div class="setting-item">
-                <label>الموسيقى</label>
-                <label class="switch">
-                    <input type="checkbox" id="musicToggle" checked>
-                    <span class="slider"></span>
-                </label>
+    <!-- زر الإعدادات -->
+    <div class="settings-btn" onclick="openSettings()"></div>
+
+    <!-- القائمة الرئيسية -->
+    <div id="main-menu">
+        <!-- الشعار -->
+        <div class="shield-container">
+            <h1>شطرنج</h1>
+            <span>3D</span>
+        </div>
+
+        <!-- الأزرار -->
+        <div class="buttons-container">
+            <div class="game-btn btn-friends" onclick="startGame('friends')">
+                <div class="icon-pawns">♟️♙</div>
+                تحدي الأصدقاء
             </div>
-
-            <div class="setting-item">
-                <label>صوت النقر</label>
-                <label class="switch">
-                    <input type="checkbox" id="sfxToggle" checked>
-                    <span class="slider"></span>
-                </label>
+            <div class="game-btn btn-computer" onclick="startGame('computer')">
+                <div class="icon-pawns">🖥️♞</div>
+                العب ضد الكمبيوتر
             </div>
-
-            <button class="close-btn" onclick="closeSettings()">حفظ وإغلاق</button>
         </div>
     </div>
 
-    <script>
-        // فتح وإغلاق الإعدادات
-        function openSettings() { document.getElementById('settingsModal').style.display = 'flex'; }
-        function closeSettings() { document.getElementById('settingsModal').style.display = 'none'; }
+    <!-- نافذة الإعدادات -->
+    <div id="settings-modal">
+        <h2>الإعدادات</h2>
+        <div class="setting-row">
+            <span>الموسيقى</span>
+            <input type="checkbox" id="music-toggle" checked onchange="toggleMusic()">
+        </div>
+        <div class="setting-row">
+            <span>صوت النقر</span>
+            <input type="checkbox" id="sfx-toggle" checked>
+        </div>
+        <button class="close-btn" onclick="closeSettings()">إغلاق</button>
+    </div>
 
-        // الانتقال إلى ملف اللعبة مع تحديد الوضع (صديق أو كمبيوتر)
-        function goToGame(mode) {
-            // الانتقال إلى game.html مع تمرير المتغير mode في الرابط
-            window.location.href = `game.html?mode=${mode}`;
+    <!-- حاوية اللعبة -->
+    <div id="game-container">
+        <button class="back-btn" onclick="goBack()">عودة</button>
+        <div class="board-3d" id="chessboard">
+            <!-- سيتم توليد الرقعة عبر الجافاسكريبت -->
+        </div>
+        <p style="color: white; margin-top: 50px; font-size: 20px;">جاري تطوير محرك اللعبة...</p>
+    </div>
+
+    <script>
+        // --- إدارة الأصوات ---
+        const bgMusic = document.getElementById('bg-music');
+        const clickSound = document.getElementById('click-sound');
+        
+        // تشغيل الموسيقى تلقائياً (قد يمنعها المتصفح حتى يتفاعل المستخدم)
+        bgMusic.volume = 0.3;
+        
+        document.body.addEventListener('click', function initAudio() {
+            if(document.getElementById('music-toggle').checked) {
+                bgMusic.play().catch(e => console.log("المتصفح منع تشغيل الصوت التلقائي"));
+            }
+            document.body.removeEventListener('click', initAudio);
+        }, { once: true });
+
+        function playClick() {
+            if(document.getElementById('sfx-toggle').checked) {
+                clickSound.currentTime = 0;
+                clickSound.play().catch(e => console.log("خطأ في الصوت"));
+            }
+        }
+
+        function toggleMusic() {
+            if(document.getElementById('music-toggle').checked) {
+                bgMusic.play();
+            } else {
+                bgMusic.pause();
+            }
+        }
+
+        // --- الإعدادات ---
+        function openSettings() {
+            playClick();
+            document.getElementById('settings-modal').style.display = 'block';
+        }
+
+        function closeSettings() {
+            playClick();
+            document.getElementById('settings-modal').style.display = 'none';
+        }
+
+        // --- توليد الرقعة (2D Pieces on 3D Board) ---
+        const boardElement = document.getElementById('chessboard');
+        // رموز القطع المسطحة 2D
+        const pieces2D = {
+            'r': '♜', 'n': '♞', 'b': '♝', 'q': '♛', 'k': '♚', 'p': '♟', // أسود
+            'R': '♖', 'N': '♘', 'B': '♗', 'Q': '♕', 'K': '♔', 'P': '♙'  // أبيض
+        };
+
+        // الترتيب الابتدائي
+        const initialBoard = [
+            ['r','n','b','q','k','b','n','r'],
+            ['p','p','p','p','p','p','p','p'],
+            ['','','','','','','',''],
+            ['','','','','','','',''],
+            ['','','','','','','',''],
+            ['','','','','','','',''],
+            ['P','P','P','P','P','P','P','P'],
+            ['R','N','B','Q','K','B','N','R']
+        ];
+
+        function createBoard() {
+            boardElement.innerHTML = '';
+            for (let row = 0; row < 8; row++) {
+                for (let col = 0; col < 8; col++) {
+                    const square = document.createElement('div');
+                    // تحديد لون المربع
+                    square.className = `square ${(row + col) % 2 === 0 ? 'white' : 'black'}`;
+                    
+                    // إضافة القطعة إذا وجدت
+                    const pieceCode = initialBoard[row][col];
+                    if (pieceCode !== '') {
+                        const pieceDiv = document.createElement('div');
+                        pieceDiv.className = 'piece-2d';
+                        pieceDiv.innerText = pieces2D[pieceCode];
+                        
+                        // تلوين القطع السوداء والبيضاء لتمييزها بشكل أفضل
+                        if (pieceCode === pieceCode.toLowerCase()) {
+                            pieceDiv.style.color = '#000';
+                        } else {
+                            pieceDiv.style.color = '#fff';
+                        }
+                        
+                        square.appendChild(pieceDiv);
+                    }
+                    
+                    // حدث النقر على المربع
+                    square.addEventListener('click', () => {
+                        playClick();
+                        // هنا يمكنك إضافة منطق تحريك القطع لاحقاً
+                    });
+
+                    boardElement.appendChild(square);
+                }
+            }
+        }
+
+        // --- بدء اللعبة ---
+        function startGame(mode) {
+            playClick();
+            document.getElementById('main-menu').style.display = 'none';
+            document.getElementById('game-container').style.display = 'flex';
+            createBoard(); // إنشاء الرقعة عند الدخول
+            
+            if(mode === 'computer') {
+                console.log("بدأت اللعبة ضد الكمبيوتر");
+                // هنا يتم ربط محرك شطرنج ذكي مثل Stockfish
+            } else {
+                console.log("بدأت لعبة التحدي مع الأصدقاء");
+            }
+        }
+
+        // --- العودة للقائمة ---
+        function goBack() {
+            playClick();
+            document.getElementById('game-container').style.display = 'none';
+            document.getElementById('main-menu').style.display = 'flex';
         }
     </script>
 </body>
