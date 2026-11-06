@@ -3,31 +3,39 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>شطرنج الوحوش</title>
+<title>شطرنج الوحوش - اللعب</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; user-select: none; -webkit-tap-highlight-color: transparent; }
-    body { background-color: #000; color: white; overflow: hidden; width: 100vw; height: 100vh; }
+    body { background-color: #0a0a0a; color: white; overflow: hidden; width: 100vw; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 
-    /* =========================================
-       الحاوية الرئيسية (خلفية صورتك)
-       ========================================= */
-    #ui-container {
-        position: absolute; inset: 0;
-        /* ✅ تم تعديل الاسم هنا ليطابق صورتك في GitHub */
+    /* شريط الحالة العلوي */
+    #top-bar { position: absolute; top: 0; width: 100%; padding: 15px; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.8); z-index: 100; border-bottom: 1px solid #333; }
+    #status { color: #ffd700; font-weight: bold; font-size: 16px; text-shadow: 0 0 10px #d4af37; }
+    .btn { background: linear-gradient(to bottom, #444, #111); color: white; border: 1px solid #555; padding: 8px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; }
+    .btn:active { transform: scale(0.95); }
+
+    /* حاوية الرقعة */
+    #board-wrapper {
+        position: relative;
+        width: 96vw; 
+        max-width: 550px;
+        aspect-ratio: 1 / 1; 
+        
+        /* ✅ اسم صورتك مثبت هنا */
         background-image: url('board.png.jpg'); 
-        background-size: 100% 100%; /* تمدد الصورة لتملأ الشاشة */
+        
+        background-size: 100% 100%;
         background-position: center;
         background-repeat: no-repeat;
-        z-index: 10;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.8);
+        margin-top: 50px; 
     }
 
-    /* =========================================
-       شبكة الشطرنج الشفافة فوق المربعات
-       ========================================= */
+    /* الشبكة الشفافة */
     #board {
         position: absolute;
-        /* تم ضبط هذه الأرقام بدقة لتناسب صورة الرقعة */
         top: 27.2%; 
         left: 2%;
         width: 96%; 
@@ -40,10 +48,10 @@
     .square {
         display: flex; justify-content: center; align-items: center;
         cursor: pointer; position: relative;
+        border-radius: 4px;
     }
 
-    /* تأثيرات اختيار القطع */
-    .selected { background-color: rgba(255, 215, 0, 0.5) !important; box-shadow: inset 0 0 15px #ffd700; }
+    .selected { background-color: rgba(255, 215, 0, 0.4) !important; box-shadow: inset 0 0 15px #ffd700; }
     .valid-move::after {
         content: ''; position: absolute; width: 30%; height: 30%;
         background-color: rgba(0, 255, 0, 0.6); border-radius: 50%; box-shadow: 0 0 10px #0f0;
@@ -53,70 +61,57 @@
         border: 4px solid rgba(255, 0, 0, 0.8); border-radius: 50%; box-shadow: 0 0 15px #f00;
     }
 
-    /* تصميم البيادق */
     .piece {
         font-size: 9vw; 
         max-font-size: 55px;
         z-index: 5;
         line-height: 1;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        transition: transform 0.1s;
     }
-    .piece-w { color: #ffffff; text-shadow: 0 0 8px #000, 0 0 15px #ffd700; }
-    .piece-b { color: #111111; text-shadow: 0 0 8px #fff, 0 0 15px #555; }
+    .piece:active { transform: scale(0.9); }
 
-    /* =========================================
-       الأزرار الشفافة المضبوطة فوق صورتك
-       ========================================= */
-    .hotspot { position: absolute; background: transparent; cursor: pointer; z-index: 20; border-radius: 50%; }
-    .hotspot:active { background: rgba(255, 255, 255, 0.2); }
+    .piece-w { color: #ffffff; text-shadow: 0 2px 2px rgba(0,0,0,0.9), 0 0 10px rgba(255, 255, 255, 0.5); }
+    .piece-b { color: #1a1a1a; text-shadow: 0 2px 2px rgba(255,255,255,0.4), 0 0 10px rgba(0, 0, 0, 0.8); }
 
-    /* الشريط العلوي */
-    .btn-settings { top: 1.5%; left: 1%; width: 12%; height: 6%; border-radius: 10px; }
-    .btn-profile { top: 1.5%; right: 4%; width: 14%; height: 7%; border-radius: 50%; }
+    .panel { position: absolute; bottom: 15px; width: 90%; max-width: 500px; display: flex; justify-content: space-between; gap: 10px; z-index: 10; }
+    select { padding: 10px; border-radius: 8px; background: #222; color: #fff; border: 1px solid #555; font-weight: bold; }
 
-    /* الأزرار السفلية */
-    .btn-hint { bottom: 2%; left: 4%; width: 20%; height: 11%; }
-    .btn-undo { bottom: 2%; left: 27%; width: 20%; height: 11%; }
-    .btn-pieces { bottom: 2%; left: 50%; width: 20%; height: 11%; }
-    .btn-restart { bottom: 2%; left: 73%; width: 22%; height: 11%; }
-
-    /* شاشة الفوز */
-    #win-screen { display: none; position: absolute; inset: 0; background: rgba(0,0,0,0.85); z-index: 100; flex-direction: column; justify-content: center; align-items: center; }
+    #win-screen { display: none; position: absolute; inset: 0; background: rgba(0,0,0,0.9); z-index: 200; flex-direction: column; justify-content: center; align-items: center; }
     #win-screen h1 { color: #ffd700; font-size: 40px; margin-bottom: 20px; text-shadow: 0 0 20px #d4af37; }
-    .btn-win { background: #8b0000; color: white; border: 2px solid #ffd700; padding: 15px 40px; font-size: 20px; border-radius: 10px; cursor: pointer; margin-top: 20px;}
 </style>
 </head>
 <body>
 
-    <!-- الحاوية الرئيسية -->
-    <div id="ui-container">
-        <!-- شبكة اللعب (القطع) -->
-        <div id="board"></div>
-
-        <!-- الأزرار الشفافة -->
-        <div class="hotspot btn-settings" onclick="alert('الإعدادات قريباً')"></div>
-        <div class="hotspot btn-profile" onclick="alert('الملف الشخصي')"></div>
-        
-        <div class="hotspot btn-hint" onclick="showHint()"></div>
-        <div class="hotspot btn-undo" onclick="undoMove()"></div>
-        <div class="hotspot btn-pieces" onclick="alert('تغيير القطع قريباً')"></div>
-        <div class="hotspot btn-restart" onclick="restartGame()"></div>
+    <div id="top-bar">
+        <div id="status">دورك (الأبيض)</div>
+        <!-- ✅ هذا الزر يرجعك لملف index.html -->
+        <button class="btn" onclick="window.location.href='index.html'">خروج 🚪</button>
     </div>
 
-    <!-- شاشة الفوز -->
+    <div id="board-wrapper">
+        <div id="board"></div>
+    </div>
+
+    <div class="panel">
+        <select id="level">
+            <option value="easy">🟢 سهل</option>
+            <option value="hard">🔴 صعب</option>
+        </select>
+        <button class="btn" onclick="restartGame()">🔄 لعبة جديدة</button>
+        <button class="btn" onclick="undoMove()">↩ تراجع</button>
+    </div>
+
     <div id="win-screen">
         <h1 id="win-title">🏆 فوز!</h1>
-        <button class="btn-win" onclick="restartGame()">العب مرة أخرى</button>
+        <button class="btn" style="font-size: 20px; padding: 15px 30px;" onclick="restartGame()">العب مرة أخرى</button>
     </div>
 
-    <!-- مكتبة قوانين الشطرنج -->
     <script src="https://cdn.jsdelivr.net/npm/chess.js@0.10.3/chess.min.js"></script>
 
     <script>
         const game = new Chess();
         let selectedSquare = null;
         let isThinking = false;
-        let hintSquare = null;
 
         const symbols = {
             'wp': '♙', 'wn': '♘', 'wb': '♗', 'wr': '♖', 'wq': '♕', 'wk': '♔',
@@ -156,8 +151,6 @@
 
         function handleSquareClick(square) {
             if (isThinking || game.game_over() || game.turn() !== 'w') return;
-            
-            hintSquare = null;
 
             const piece = game.get(square);
 
@@ -180,7 +173,8 @@
                 if (checkGameOver()) return;
 
                 isThinking = true;
-                setTimeout(makeComputerMove, 300); 
+                document.getElementById('status').textContent = 'الكمبيوتر يفكر...';
+                setTimeout(makeComputerMove, 300);
             } else {
                 if (piece && piece.color === 'w') {
                     selectedSquare = square;
@@ -194,7 +188,6 @@
 
         function updateHighlights() {
             document.querySelectorAll('.square').forEach(sq => sq.classList.remove('selected', 'valid-move', 'valid-capture'));
-            
             if (!selectedSquare) return;
 
             const selectedDiv = document.querySelector(`[data-square="${selectedSquare}"]`);
@@ -220,10 +213,12 @@
             let bestMove = null;
             let bestValue = -9999;
             const pieceValues = { p: 10, n: 30, b: 30, r: 50, q: 90, k: 900 };
+            const isHard = document.getElementById('level').value === 'hard';
 
             moves.forEach(move => {
                 game.move(move);
                 let boardValue = 0;
+                
                 game.board().forEach(row => {
                     row.forEach(piece => {
                         if (piece) {
@@ -234,7 +229,7 @@
                 });
                 game.undo();
 
-                boardValue += Math.random() * 30;
+                if (!isHard) boardValue += Math.random() * 50; 
 
                 if (boardValue > bestValue) {
                     bestValue = boardValue;
@@ -254,14 +249,21 @@
             const winTitle = document.getElementById('win-title');
 
             if (game.in_checkmate()) {
+                const winner = game.turn() === 'w' ? 'الأسود' : 'الأبيض';
+                document.getElementById('status').textContent = `كش مات! ${winner} فاز`;
                 winTitle.textContent = game.turn() === 'w' ? '💀 خسارة' : '🏆 فوز ساحق!';
                 winTitle.style.color = game.turn() === 'w' ? '#ff4d4d' : '#ffd700';
                 winScreen.style.display = 'flex';
                 return true;
             } else if (game.in_draw()) {
+                document.getElementById('status').textContent = 'تعادل!';
                 winTitle.textContent = '🤝 تعادل';
                 winScreen.style.display = 'flex';
                 return true;
+            } else if (game.in_check()) {
+                document.getElementById('status').textContent = game.turn() === 'w' ? '⚠️ كش! دورك' : '⚠️ كش! الكمبيوتر';
+            } else {
+                document.getElementById('status').textContent = game.turn() === 'w' ? 'دورك (الأبيض)' : 'الكمبيوتر...';
             }
             return false;
         }
@@ -270,37 +272,18 @@
             game.reset();
             selectedSquare = null;
             isThinking = false;
-            hintSquare = null;
             document.getElementById('win-screen').style.display = 'none';
             renderBoard();
+            checkGameOver();
         }
 
         function undoMove() {
             if (isThinking || game.history().length < 2) return;
-            game.undo(); 
-            game.undo(); 
+            game.undo();
+            game.undo();
             selectedSquare = null;
-            hintSquare = null;
             renderBoard();
-        }
-
-        function showHint() {
-            if (isThinking || game.turn() !== 'w') return;
-            const moves = game.moves({ verbose: true });
-            if (moves.length > 0) {
-                const randomMove = moves[Math.floor(Math.random() * moves.length)];
-                hintSquare = randomMove.from;
-                
-                document.querySelectorAll('.square').forEach(sq => {
-                    sq.style.boxShadow = "none";
-                    sq.style.backgroundColor = "transparent";
-                });
-                const hDiv = document.querySelector(`[data-square="${hintSquare}"]`);
-                if (hDiv) {
-                    hDiv.style.boxShadow = "inset 0 0 20px 5px #00ffff";
-                    hDiv.style.backgroundColor = "rgba(0, 255, 255, 0.4)";
-                }
-            }
+            checkGameOver();
         }
 
         restartGame();
