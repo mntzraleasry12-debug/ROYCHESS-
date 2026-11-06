@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>شطرنج 3D - القائمة الرئيسية</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent; /* لمنع وميض الشاشة عند النقر على الجوال */
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000;
+        }
+
+        /* حاوية اللعبة التي تحتوي على الصورة */
+        .game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            /* استدعاء الصورة كخلفية */
+            background-image: url('menu.png');
+            background-size: cover; /* تغطية الشاشة بالكامل */
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        /* --- المناطق القابلة للنقر (شفافة فوق الصورة) --- */
+        .click-zone {
+            position: absolute;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-radius: 15px;
+        }
+
+        /* تأثير عند تمرير الماوس أو النقر (اختياري) */
+        .click-zone:active {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(0.95);
+        }
+
+        /* 1. منطقة زر الإعدادات (أعلى اليسار) */
+        .btn-settings-zone {
+            top: 2%;
+            left: 3%;
+            width: 12%;
+            height: 8%;
+        }
+
+        /* 2. منطقة زر تحدي الأصدقاء (البنفسجي - أسفل اليسار) */
+        .btn-friends-zone {
+            bottom: 5%;
+            left: 4%;
+            width: 44%;
+            height: 18%;
+        }
+
+        /* 3. منطقة زر اللعب ضد الكمبيوتر (الأصفر - أسفل اليمين) */
+        .btn-cpu-zone {
+            bottom: 5%;
+            right: 4%;
+            width: 44%;
+            height: 18%;
+        }
+
+        /* --- تصميم قائمة الإعدادات (Settings Modal) --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            backdrop-filter: blur(8px);
+        }
+
+        .settings-modal {
+            background: #1a1a1a;
+            border: 3px solid #ffcc00;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 350px;
+            padding: 25px;
+            box-shadow: 0 0 30px rgba(255, 204, 0, 0.3);
+            color: white;
+            text-align: center;
+            animation: popIn 0.3s ease-out;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .settings-modal h2 {
+            color: #ffcc00;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #333;
+        }
+
+        .setting-item label {
+            font-size: 18px;
+        }
+
+        /* أزرار التبديل (Toggle Switches) */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #555;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px; width: 18px;
+            left: 4px; bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider { background-color: #ffcc00; }
+        input:checked + .slider:before { transform: translateX(24px); }
+
+        /* القائمة المنسدلة */
+        select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            background: #333;
+            color: white;
+            border: 1px solid #ffcc00;
+            font-family: 'Cairo', sans-serif;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .close-btn {
+            background: #ffcc00;
+            color: #000;
+            border: none;
+            padding: 12px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 15px;
+            width: 100%;
+            transition: background 0.2s;
+        }
+        .close-btn:active { background: #d4aa00; }
+
+    </style>
+</head>
+<body>
+
+    <!-- حاوية اللعبة -->
+    <div class="game-container">
+        
+        <!-- مناطق النقر الشفافة فوق الصورة -->
+        <!-- زر الإعدادات (الترس) -->
+        <div class="click-zone btn-settings-zone" onclick="openSettings()"></div>
+        
+        <!-- زر تحدي الأصدقاء -->
+        <div class="click-zone btn-friends-zone" onclick="playGame('تحدي الأصدقاء')"></div>
+        
+        <!-- زر اللعب ضد الكمبيوتر -->
+        <div class="click-zone btn-cpu-zone" onclick="playGame('ضد الكمبيوتر')"></div>
+
+    </div>
+
+    <!-- قائمة الإعدادات -->
+    <div class="modal-overlay" id="settingsModal">
+        <div class="settings-modal">
+            <h2>⚙️ الإعدادات</h2>
+            
+            <!-- موسيقى الخلفية -->
+            <div class="setting-item">
+                <label>الموسيقى (Music)</label>
+                <label class="switch">
+                    <input type="checkbox" id="musicToggle" checked onchange="toggleMusic(this)">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <!-- صوت النقر -->
+            <div class="setting-item">
+                <label>صوت النقر (Click SFX)</label>
+                <label class="switch">
+                    <input type="checkbox" id="sfxToggle" checked onchange="toggleSFX(this)">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <!-- زوايا الشطرنج -->
+            <div class="setting-item" style="flex-direction: column; align-items: flex-start; border-bottom: none;">
+                <label style="margin-bottom: 10px;">زاوية الكاميرا/الشطرنج</label>
+                <select id="angleSelect" onchange="changeAngle(this.value)">
+                    <option value="top">من الأعلى (Top-Down)</option>
+                    <option value="angled" selected>مائل (3D Angled)</option>
+                    <option value="side">جانبي (Side View)</option>
+                </select>
+            </div>
+
+            <button class="close-btn" onclick="closeSettings()">حفظ وإغلاق</button>
+        </div>
+    </div>
+
+    <!-- السكريبت (Logic) -->
+    <script>
+        // متغيرات للتحكم بالصوت (محاكاة)
+        let sfxEnabled = true;
+
+        // دالة فتح الإعدادات
+        function openSettings() {
+            playClickSound();
+            document.getElementById('settingsModal').style.display = 'flex';
+        }
+
+        // دالة إغلاق الإعدادات
+        function closeSettings() {
+            playClickSound();
+            document.getElementById('settingsModal').style.display = 'none';
+        }
+
+        // دالة النقر على أزرار اللعب
+        function playGame(mode) {
+            playClickSound();
+            // هنا يمكنك توجيه اللاعب لصفحة اللعبة
+            console.log("تم اختيار وضع: " + mode);
+            alert("جاري بدء اللعبة: " + mode);
+        }
+
+        // التحكم في الموسيقى
+        function toggleMusic(element) {
+            playClickSound();
+            if (element.checked) {
+                console.log("🎵 الموسيقى: تعمل");
+                // كود تشغيل الموسيقى هنا
+            } else {
+                console.log("🔇 الموسيقى: متوقفة");
+                // كود إيقاف الموسيقى هنا
+            }
+        }
+
+        // التحكم في صوت النقر
+        function toggleSFX(element) {
+            sfxEnabled = element.checked;
+            playClickSound(); // سيتم تشغيل الصوت لأننا غيرنا الحالة للتو
+            console.log("🔊 صوت النقر: " + (sfxEnabled ? "يعمل" : "متوقف"));
+        }
+
+        // تغيير زاوية الشطرنج
+        function changeAngle(angle) {
+            playClickSound();
+            console.log("📐 تم تغيير زاوية الشطرنج إلى: " + angle);
+            // كود تغيير زاوية الكاميرا في محرك اللعبة
+        }
+
+        // دالة تشغيل صوت النقر
+        function playClickSound() {
+            if (sfxEnabled) {
+                // هنا يتم تشغيل الصوت الحقيقي (مثال باستخدام ملف صوتي)
+                // let audio = new Audio('click.mp3');
+                // audio.play();
+                console.log("🔉 *صوت نقر*");
+            }
+        }
+    </script>
+</body>
+              </html>
